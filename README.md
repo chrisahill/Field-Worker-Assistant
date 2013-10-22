@@ -7,5 +7,5 @@
 * `Thad Tilton`
 * `Christopher Hill`
 * `Hisham Massih`
-* `Rich Zwapp`
+* `Rich Zwaap`
 * `Don Kemlage`
