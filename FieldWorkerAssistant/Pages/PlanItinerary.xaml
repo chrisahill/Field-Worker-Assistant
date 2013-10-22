@@ -8,6 +8,9 @@
     xmlns:common="using:FieldWorkerAssistant.Common"
     xmlns:converters="using:FieldWorkerAssistant.Converters"
     xmlns:commands="using:FieldWorkerAssistant.Commands"
+    xmlns:esri="using:Esri.ArcGISRuntime.Controls"
+    xmlns:esriLayers="using:Esri.ArcGISRuntime.Layers"
+    xmlns:esriSymbols="using:Esri.ArcGISRuntime.Symbology"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -16,6 +19,8 @@
         <converters:PriorityToBrushConverter x:Key="PriorityToColorConverter" />
         <commands:SelectAllCommand x:Key="SelectAllCommand" />
         <commands:ClearSelectedCommand x:Key="ClearSelectedCommand" />
+        <Grid x:Key="DataContextProxy" Tag="{Binding}" />
+        <converters:ServiceItemsToFeatures x:Key="ServiceItemsToFeaturesConverter" />
         
         <!-- TODO: Delete this line if the key AppName is declared in App.xaml -->
         <x:String x:Key="AppName">Select Itinerary Items</x:String>
@@ -89,13 +94,17 @@
         * Row 1 contains the rest of the page layout
     -->
     <Grid Style="{StaticResource LayoutRootStyle}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="140"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Back button and page title -->
-        <Grid Background="#333333">
+        <Grid Background="#333333" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -113,47 +122,82 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
-                            <StackPanel Orientation="Horizontal"
-                                        VerticalAlignment="Center">
-                                <CheckBox x:Name="IncludedCheckBox"
-                                    IsChecked="{Binding Included, Mode=TwoWay}"
-                                    IsHitTestVisible="False"
-                                          Margin="0,5,0,5">
-                                    <CheckBox.RenderTransform>
-                                        <ScaleTransform CenterX="10" CenterY="10"
-                                                        ScaleX="1.4" ScaleY="1.4" />
-                                    </CheckBox.RenderTransform>
-                                </CheckBox>
-                                <TextBlock 
-                                    Margin="20,5,0,5" 
-                                    FontSize="30" 
-                                    Foreground="White" 
-                                    Opacity="0.7"
-                                    VerticalAlignment="Center" 
-                                    Text="{Binding Service.ServiceRequestID}" 
-                                    Width="100" />
-                                <TextBlock 
-                                    Margin="10,5,0,5" 
-                                    FontSize="30" 
-                                    Foreground="{Binding Service.Severity,
-                                        Converter={StaticResource PriorityToColorConverter}}" 
-                                    VerticalAlignment="Center" 
-                                    Text="{Binding Service.Severity}" 
-                                    Width="125" />
-                                <TextBlock 
-                                    Margin="10,5,0,5" 
-                                    FontSize="30" 
-                                    Foreground="White" 
-                                    VerticalAlignment="Center" 
-                                    Text="{Binding Service.ProblemDescription}" 
-                                    TextWrapping="Wrap" />
-                            </StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox x:Name="IncludedCheckBox"
+                                IsChecked="{Binding Included, Mode=TwoWay}"
+                                IsHitTestVisible="False"
+                                        Margin="0,5,0,5">
+                                <CheckBox.RenderTransform>
+                                    <ScaleTransform CenterX="10" CenterY="10"
+                                                    ScaleX="1.4" ScaleY="1.4" />
+                                </CheckBox.RenderTransform>
+                            </CheckBox>
+                            <TextBlock 
+                                Margin="20,5,0,5" 
+                                FontSize="30" 
+                                Foreground="White" 
+                                Opacity="0.7"
+                                VerticalAlignment="Center" 
+                                Text="{Binding Service.ServiceRequestID}" 
+                                Width="100" 
+                                Grid.Column="1"/>
+                            <TextBlock 
+                                Margin="10,5,0,5" 
+                                FontSize="30" 
+                                Foreground="{Binding Service.Severity,
+                                    Converter={StaticResource PriorityToColorConverter}}" 
+                                VerticalAlignment="Center" 
+                                Text="{Binding Service.Severity}" 
+                                Width="125"
+                                Grid.Column="2"/>
+                            <TextBlock 
+                                Margin="10,5,0,5" 
+                                FontSize="30" 
+                                Foreground="White" 
+                                VerticalAlignment="Center" 
+                                Text="{Binding Service.ProblemDescription}" 
+                                TextWrapping="Wrap"
+                                Grid.Column="3"/>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
 
+        <esri:Map x:Name="MainMap"
+                  Grid.Column="1"
+                  Grid.Row="1"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch">
+            <esriLayers:ArcGISTiledMapServiceLayer
+                ServiceUri="http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer" />
+            <esriLayers:GraphicsLayer 
+                ID="IncludedItemsLayer">
+                <esriLayers:GraphicsLayer.Renderer>
+                    <esriSymbols:SimpleRenderer>
+                        <esriSymbols:SimpleRenderer.Symbol>
+                            <esriSymbols:SimpleMarkerSymbol Color ="LightGreen"
+                                                            Size="24">
+                                <esriSymbols:SimpleMarkerSymbol.Outline>
+                                    <esriSymbols:SimpleLineSymbol Color="Black"
+                                                                  Width="2" />
+                                </esriSymbols:SimpleMarkerSymbol.Outline>
+                            </esriSymbols:SimpleMarkerSymbol>
+                        </esriSymbols:SimpleRenderer.Symbol>
+                    </esriSymbols:SimpleRenderer>
+                </esriLayers:GraphicsLayer.Renderer>
+            </esriLayers:GraphicsLayer>
+            <esriLayers:FeatureLayer
+                ID="WorkItemsLayer"
+                ServiceUri="http://services.arcgis.com/pmcEyn9tLWCoX7Dm/arcgis/rest/services/HackathonSR/FeatureServer/0" 
+                Renderer="{StaticResource WorkItemsRenderer}"/>
+
+        </esri:Map>
         <VisualStateManager.VisualStateGroups>
 
             <!-- Visual states reflect the application's view state -->

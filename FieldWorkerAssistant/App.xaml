@@ -14,7 +14,9 @@
                  -->
                 <ResourceDictionary Source="Common/StandardStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <SolidColorBrush x:Key="ListBoxItemSelectedBackgroundThemeBrush" Color="#55FFFFFF" />
+            <SolidColorBrush x:Key="ListBoxItemSelectedBackgroundThemeBrush" Color="#33FFFFFF" />
+            <SolidColorBrush x:Key="ListBoxItemPointerOverBackgroundThemeBrush" Color="#16FFFFFF" />
+            <SolidColorBrush x:Key="ListBoxItemSelectedPointerOverBackgroundThemeBrush" Color="#05FFFFFF" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

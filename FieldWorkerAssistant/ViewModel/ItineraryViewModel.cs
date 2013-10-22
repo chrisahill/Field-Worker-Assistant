@@ -1,4 +1,7 @@
-﻿using FieldWorkerAssistant.Model;
+﻿using Esri.ArcGISRuntime.Data;
+using Esri.ArcGISRuntime.Geometry;
+using Esri.ArcGISRuntime.Layers;
+using FieldWorkerAssistant.Model;
 using FieldWorkerAssitant.Common;
 using System;
 using System.Collections.Generic;
@@ -6,34 +9,57 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace FieldWorkerAssistant.ViewModel
 {
-    internal class ItineraryViewModel
+    internal class ItineraryViewModel : INotifyPropertyChanged
     {
         public ItineraryViewModel()
         {
-            AllServiceItems = new ObservableCollection<ServiceItemViewModel>
-            {
-                new ServiceItemViewModel(new ServiceItem{ ServiceRequestID = 1001, Severity = "High", ProblemDescription=" This is a really big problem need someone on it right away."}),
-                new ServiceItemViewModel(new ServiceItem{ ServiceRequestID = 1002, Severity = "Normal", ProblemDescription=" This is a normal issue fix when you can."}),
-                new ServiceItemViewModel(new ServiceItem{ ServiceRequestID = 1003, Severity = "Low", ProblemDescription=" This is low priority get to it when have nothing to do."}),
-                new ServiceItemViewModel(new ServiceItem{ ServiceRequestID = 1004, Severity = "Normal", ProblemDescription=" This is a normal issue fix when you can."}),
-                new ServiceItemViewModel(new ServiceItem{ ServiceRequestID = 1005, Severity = "Normal", ProblemDescription=" This is a normal issue fix when you can."}),
-            };
+            int[] ids = new int[] { 1001, 1002, 1003, 1004, 1005 };
+            string[] priorities = new string[] { "High", "Normal", "Low", "Normal", "Normal" };
+            string[] problemDescriptions = new string[] { 
+                "This is a really big problem need someone on it right away.", 
+                "This is a normal issue fix when you can.", 
+                "This is low priority get to it when have nothing to do.", 
+                "This is a normal issue fix when you can.", 
+                "This is a normal issue fix when you can." };
+            MapPoint[] coords = new MapPoint[] {
+                new MapPoint(-13046000, 4037000, SpatialReferences.WebMercator),
+                new MapPoint(-13045000, 4036000, SpatialReferences.WebMercator),
+                new MapPoint(-13044000, 4035000, SpatialReferences.WebMercator),
+                new MapPoint(-13044500, 4034800, SpatialReferences.WebMercator),
+                new MapPoint(-13045200, 4035800, SpatialReferences.WebMercator) };
+            AllServiceItems = new ObservableCollection<ServiceItemViewModel>();
 
-            foreach (var item in AllServiceItems)
-                item.PropertyChanged += item_PropertyChanged;
+            for (int i = 0; i < ids.Length; i++)
+            {
+                Graphic g = new Graphic();
+                g.Attributes["ServiceRequestID"] = ids[i];
+                g.Attributes["Severity"] = priorities[i];
+                g.Attributes["ProblemDescription"] = problemDescriptions[i];
+                g.Geometry = coords[i];
+                var viewModel = new ServiceItemViewModel(new ServiceItem(g));
+                viewModel.PropertyChanged += item_PropertyChanged;
+                AllServiceItems.Add(viewModel);
+            }
+
+            AllServiceItems.CollectionChanged += AllServiceItems_CollectionChanged;
 
             IncludedServiceItems = new ObservableCollection<ServiceItemViewModel>();
-
             IncludedServiceItems.CollectionChanged += IncludedServiceItems_CollectionChanged;
 
             IncludeAllCommand = new DelegateCommand(includeAll, canIncludeAll);
             ExcludeAllCommand = new DelegateCommand(excludeAll, canExcludeAll);
+        }
+
+        void AllServiceItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged("AllServiceItems");
         }
 
         void IncludedServiceItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -51,6 +77,8 @@ namespace FieldWorkerAssistant.ViewModel
             }
 
             raiseCanExecuteChanged();
+
+            OnPropertyChanged("IncludedServiceItems");
         }
 
         void item_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -69,6 +97,23 @@ namespace FieldWorkerAssistant.ViewModel
         public ICommand IncludeAllCommand { get; private set; }
 
         public ICommand ExcludeAllCommand { get; private set; }
+
+        public void InitializeServiceItems(IEnumerable<Feature> features)
+        {
+            if (ExcludeAllCommand.CanExecute(null))
+                ExcludeAllCommand.Execute(null);
+
+            ServiceItemViewModel[] allItemsCopy = AllServiceItems.ToArray();
+            foreach (var item in allItemsCopy)
+                AllServiceItems.Remove(item);
+
+            foreach (var feature in features)
+            {
+                var serviceItem = new ServiceItem(feature);
+                var viewModel = new ServiceItemViewModel(serviceItem);
+                AllServiceItems.Add(viewModel);
+            }
+        }
 
         private bool canIncludeAll(object parameter)
         {
@@ -100,6 +145,14 @@ namespace FieldWorkerAssistant.ViewModel
         {
             ((DelegateCommand)IncludeAllCommand).RaiseCanExecuteChanged();
             ((DelegateCommand)ExcludeAllCommand).RaiseCanExecuteChanged();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
