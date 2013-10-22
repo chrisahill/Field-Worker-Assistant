@@ -41,6 +41,56 @@
             <TextBlock x:Name="pageTime" Grid.Column="3" Foreground="#3388ff" Text="11:05 AM" Style="{StaticResource PageHeaderTextStyle}" HorizontalAlignment="Right"/>
         </Grid>
 
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <ScrollViewer Background="Transparent">                    
+                    <StackPanel Margin="50">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0"  Text="Priority:" Margin="5" FontSize="30"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="High" Foreground="#ff3344" Margin="5" FontSize="30" />                        
+                            <TextBlock Grid.Row="1" Text="Description:" Margin="5" FontSize="30"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="This is description text that explains the problem and what needs to be done or something like that ^_^" Margin="5" FontSize="30" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Row="2" Text="Arrival Time:" Margin="5" FontSize="30"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="Time Picker Control" Margin="5" FontSize="30" />
+                            <TextBlock Grid.Row="3" Text="Leave Time:" Margin="5" FontSize="30"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="Time Picker Control" Margin="5" FontSize="30" />
+                            <TextBlock Grid.Row="4" Text="Actions Taken:" Margin="5" FontSize="30"/>
+                            <TextBox Grid.Row="4" Grid.Column="1" Text="Used the repair tool and fixed all problems.. the repair tool fixes everything!!!" Margin="5" Height="300" FontSize="24" AcceptsReturn="True" TextWrapping="Wrap" />
+                        </Grid>
+                    </StackPanel>                                            
+                </ScrollViewer>
+            </Grid>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*"  />
+                </Grid.RowDefinitions>
+                <Rectangle Width="250" Height="250" Fill="#333333" Margin="100,50,100,10" />
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="Mini Map" FontSize="24" Margin="100,50,100,10" />
+                <Grid Grid.Row="1">
+                    <StackPanel MaxWidth="250">
+                        <TextBlock Text="11041 5th st. Redlands, Ca 92373" TextWrapping="Wrap" FontSize="24" Margin="10"/>
+                        <TextBlock Text="Lat: 34, Lon: -135" FontSize="24" TextWrapping="Wrap" Margin="10" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+        
         <VisualStateManager.VisualStateGroups>
 
             <!-- Visual states reflect the application's view state -->
