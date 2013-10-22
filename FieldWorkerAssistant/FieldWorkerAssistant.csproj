@@ -106,18 +106,25 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Commands\ClearSelectedCommand.cs" />
+    <Compile Include="Commands\SelectAllCommand.cs" />
     <Compile Include="Common\BindableBase.cs" />
     <Compile Include="Common\BooleanNegationConverter.cs" />
     <Compile Include="Common\BooleanToVisibilityConverter.cs" />
+    <Compile Include="Common\Constants.cs" />
+    <Compile Include="Common\DelegateCommand.cs" />
     <Compile Include="Common\LayoutAwarePage.cs" />
+    <Compile Include="Common\AttachedProperties.cs" />
     <Compile Include="Common\RichTextColumns.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
+    <Compile Include="Converters\PriorityToBrushConverter.cs" />
+    <Compile Include="Converters\ZeroToBoolConverter.cs" />
     <Compile Include="Model\ServiceItem.cs" />
     <Compile Include="Pages\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\PlanRoute.xaml.cs">
-      <DependentUpon>PlanRoute.xaml</DependentUpon>
+    <Compile Include="Pages\PlanItinerary.xaml.cs">
+      <DependentUpon>PlanItinerary.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\Route.xaml.cs">
       <DependentUpon>Route.xaml</DependentUpon>
@@ -126,6 +133,8 @@
       <DependentUpon>Worksheet.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModel\ItineraryViewModel.cs" />
+    <Compile Include="ViewModel\ServiceItemViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -153,7 +162,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Pages\PlanRoute.xaml">
+    <Page Include="Pages\PlanItinerary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

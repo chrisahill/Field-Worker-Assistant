@@ -1,6 +1,9 @@
 ﻿using FieldWorkerAssistant.Model;
+using FieldWorkerAssistant.ViewModel;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using Windows.Foundation;
@@ -18,32 +21,15 @@ using Windows.UI.Xaml.Navigation;
 namespace FieldWorkerAssistant.Pages
 {
     /// <summary>
-    /// A basic page that provides characteristics common to most applications.
+    /// Page for specifying the items to include in the itinerary
     /// </summary>
-    public sealed partial class PlanRoute : FieldWorkerAssistant.Common.LayoutAwarePage
+    public sealed partial class PlanItinerary : FieldWorkerAssistant.Common.LayoutAwarePage
     {
-        public class MockData
-        {
-            public List<ServiceItem> OnlineServiceItems
-            {
-                get 
-                { 
-                    return new List<ServiceItem>
-                    {
-                        new ServiceItem{ ServiceRequestID = 1001, Severity = "High", ProblemDescription=" This is a really big problem need someone on it right away."},
-                        new ServiceItem{ ServiceRequestID = 1002, Severity = "Normal", ProblemDescription=" This is a normal issue fix when you can."},
-                        new ServiceItem{ ServiceRequestID = 1003, Severity = "Low", ProblemDescription=" This is low priority get to it when have nothing to do."},
-                        new ServiceItem{ ServiceRequestID = 1004, Severity = "Normal", ProblemDescription=" This is a normal issue fix when you can."},
-                        new ServiceItem{ ServiceRequestID = 1005, Severity = "Normal", ProblemDescription=" This is a normal issue fix when you can."},
-                    };
-                }             
-             }
-        }
-
-        public PlanRoute()
+        ItineraryViewModel m_viewModel = new ItineraryViewModel();
+        public PlanItinerary()
         {
             this.InitializeComponent();
-            this.DataContext = new MockData();
+            this.DataContext = m_viewModel;
         }
 
         /// <summary>
@@ -67,6 +53,15 @@ namespace FieldWorkerAssistant.Pages
         /// <param name="pageState">An empty dictionary to be populated with serializable state.</param>
         protected override void SaveState(Dictionary<String, Object> pageState)
         {
+        }
+
+        private void ItineraryListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            foreach (ServiceItemViewModel item in e.AddedItems)
+                item.Included = true;
+
+            foreach (ServiceItemViewModel item in e.RemovedItems)
+                item.Included = false;
         }
     }
 }

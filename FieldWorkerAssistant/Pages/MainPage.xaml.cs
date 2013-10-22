@@ -38,7 +38,7 @@ namespace FieldWorkerAssistant
 
         private void NewRoute_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(PlanRoute));
+            Frame.Navigate(typeof(PlanItinerary));
         }
 
         private void CurrentRoute_Click(object sender, RoutedEventArgs e)
