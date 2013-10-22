@@ -2,12 +2,12 @@
 
 
 ####Team Members
-* `Preeti Maske`
-* `Jennifer Nery`
-* `Thad Tilton`
-* `Christopher Hill`
-* `Hisham Massih`
-* `Rich Zwaap`
+* `Preeti Maske` - Authoring Offline Services
+* `Jennifer Nery` - Development With Offline Services
+* `Thad Tilton` - Presenting & QA
+* `Christopher Hill` Development UX Design
+* `Hisham Massih` - Development With Offline Services
+* `Rich Zwaap` - Developement UX Design
 
 
 
