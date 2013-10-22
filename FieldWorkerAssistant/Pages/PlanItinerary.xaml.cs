@@ -52,17 +52,14 @@ namespace FieldWorkerAssistant.Pages
             BindingOperations.SetBinding(includedItemsLayer, GraphicsLayer.GraphicsSourceProperty, b);
 
             FeatureLayer workItemsLayer = (FeatureLayer)MainMap.Layers["WorkItemsLayer"];
-            if (workItemsLayer.IsInitialized)
+            if (workItemsLayer.Graphics.Count > 0)
             {
                 viewModel.InitializeServiceItems(workItemsLayer.Graphics);
             }
             else
             {
-                this.Loaded += async (o, e) =>
-                {
-                    await workItemsLayer.InitializeAsync();
+                workItemsLayer.Graphics.CollectionChanged += (o, e) => 
                     viewModel.InitializeServiceItems(workItemsLayer.Graphics);
-                };
             }
         }
 

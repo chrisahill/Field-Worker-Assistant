@@ -1,4 +1,5 @@
 ﻿using Esri.ArcGISRuntime.Symbology;
+using FieldWorkerAssistant.Common;
 using FieldWorkerAssistant.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -70,17 +71,17 @@ namespace FieldWorkerAssistant
             UniqueValueInfo lowPriorityInfo = new UniqueValueInfo()
             {
                 Symbol = lowPrioritySymbol,
-                Values = new UniqueValueCollection("Low")
+                Values = new UniqueValueCollection(Constants.LOW_PRIORITY)
             };
             UniqueValueInfo mediumPriorityInfo = new UniqueValueInfo()
             {
                 Symbol = mediumPrioritySymbol,
-                Values = new UniqueValueCollection("Medium")
+                Values = new UniqueValueCollection(Constants.NORMAL_PRIORITY)
             };
             UniqueValueInfo highPriorityInfo = new UniqueValueInfo()
             {
                 Symbol = highPrioritySymbol,
-                Values = new UniqueValueCollection("High")
+                Values = new UniqueValueCollection(Constants.HIGH_PRIORITY)
             };
 
             UniqueValueRenderer uvRenderer = new UniqueValueRenderer();

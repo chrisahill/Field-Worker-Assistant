@@ -11,6 +11,7 @@
     xmlns:esri="using:Esri.ArcGISRuntime.Controls"
     xmlns:esriLayers="using:Esri.ArcGISRuntime.Layers"
     xmlns:esriSymbols="using:Esri.ArcGISRuntime.Symbology"
+    xmlns:esriQuery="using:Esri.ArcGISRuntime.Tasks.Query"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -176,13 +177,23 @@
                   VerticalAlignment="Stretch">
             <esriLayers:ArcGISTiledMapServiceLayer
                 ServiceUri="http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer" />
+            <esriLayers:FeatureLayer
+                ID="WorkItemsLayer"
+                ServiceUri="http://services.arcgis.com/pmcEyn9tLWCoX7Dm/arcgis/rest/services/HackathonSR/FeatureServer/0" 
+                Renderer="{StaticResource WorkItemsRenderer}">
+                <esriLayers:FeatureLayer.OutFields>
+                    <esriQuery:OutFields>
+                        <x:String>*</x:String>
+                    </esriQuery:OutFields>
+                </esriLayers:FeatureLayer.OutFields>
+            </esriLayers:FeatureLayer>
             <esriLayers:GraphicsLayer 
                 ID="IncludedItemsLayer">
                 <esriLayers:GraphicsLayer.Renderer>
                     <esriSymbols:SimpleRenderer>
                         <esriSymbols:SimpleRenderer.Symbol>
-                            <esriSymbols:SimpleMarkerSymbol Color ="LightGreen"
-                                                            Size="24">
+                            <esriSymbols:SimpleMarkerSymbol Color ="Cyan"
+                                                            Size="20">
                                 <esriSymbols:SimpleMarkerSymbol.Outline>
                                     <esriSymbols:SimpleLineSymbol Color="Black"
                                                                   Width="2" />
@@ -192,10 +203,6 @@
                     </esriSymbols:SimpleRenderer>
                 </esriLayers:GraphicsLayer.Renderer>
             </esriLayers:GraphicsLayer>
-            <esriLayers:FeatureLayer
-                ID="WorkItemsLayer"
-                ServiceUri="http://services.arcgis.com/pmcEyn9tLWCoX7Dm/arcgis/rest/services/HackathonSR/FeatureServer/0" 
-                Renderer="{StaticResource WorkItemsRenderer}"/>
 
         </esri:Map>
         <VisualStateManager.VisualStateGroups>

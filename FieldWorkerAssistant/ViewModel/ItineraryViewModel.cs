@@ -20,33 +20,33 @@ namespace FieldWorkerAssistant.ViewModel
     {
         public ItineraryViewModel()
         {
-            int[] ids = new int[] { 1001, 1002, 1003, 1004, 1005 };
-            string[] priorities = new string[] { "High", "Normal", "Low", "Normal", "Normal" };
-            string[] problemDescriptions = new string[] { 
-                "This is a really big problem need someone on it right away.", 
-                "This is a normal issue fix when you can.", 
-                "This is low priority get to it when have nothing to do.", 
-                "This is a normal issue fix when you can.", 
-                "This is a normal issue fix when you can." };
-            MapPoint[] coords = new MapPoint[] {
-                new MapPoint(-13046000, 4037000, SpatialReferences.WebMercator),
-                new MapPoint(-13045000, 4036000, SpatialReferences.WebMercator),
-                new MapPoint(-13044000, 4035000, SpatialReferences.WebMercator),
-                new MapPoint(-13044500, 4034800, SpatialReferences.WebMercator),
-                new MapPoint(-13045200, 4035800, SpatialReferences.WebMercator) };
+            //int[] ids = new int[] { 1001, 1002, 1003, 1004, 1005 };
+            //string[] priorities = new string[] { "High", "Normal", "Low", "Normal", "Normal" };
+            //string[] problemDescriptions = new string[] { 
+            //    "This is a really big problem need someone on it right away.", 
+            //    "This is a normal issue fix when you can.", 
+            //    "This is low priority get to it when have nothing to do.", 
+            //    "This is a normal issue fix when you can.", 
+            //    "This is a normal issue fix when you can." };
+            //MapPoint[] coords = new MapPoint[] {
+            //    new MapPoint(-13046000, 4037000, SpatialReferences.WebMercator),
+            //    new MapPoint(-13045000, 4036000, SpatialReferences.WebMercator),
+            //    new MapPoint(-13044000, 4035000, SpatialReferences.WebMercator),
+            //    new MapPoint(-13044500, 4034800, SpatialReferences.WebMercator),
+            //    new MapPoint(-13045200, 4035800, SpatialReferences.WebMercator) };
             AllServiceItems = new ObservableCollection<ServiceItemViewModel>();
 
-            for (int i = 0; i < ids.Length; i++)
-            {
-                Graphic g = new Graphic();
-                g.Attributes["ServiceRequestID"] = ids[i];
-                g.Attributes["Severity"] = priorities[i];
-                g.Attributes["ProblemDescription"] = problemDescriptions[i];
-                g.Geometry = coords[i];
-                var viewModel = new ServiceItemViewModel(new ServiceItem(g));
-                viewModel.PropertyChanged += item_PropertyChanged;
-                AllServiceItems.Add(viewModel);
-            }
+            //for (int i = 0; i < ids.Length; i++)
+            //{
+            //    Graphic g = new Graphic();
+            //    g.Attributes["ServiceRequestID"] = ids[i];
+            //    g.Attributes["Severity"] = priorities[i];
+            //    g.Attributes["ProblemDescription"] = problemDescriptions[i];
+            //    g.Geometry = coords[i];
+            //    var viewModel = new ServiceItemViewModel(new ServiceItem(g));
+            //    viewModel.PropertyChanged += item_PropertyChanged;
+            //    AllServiceItems.Add(viewModel);
+            //}
 
             AllServiceItems.CollectionChanged += AllServiceItems_CollectionChanged;
 
