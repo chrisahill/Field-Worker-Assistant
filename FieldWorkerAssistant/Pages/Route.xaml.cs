@@ -24,6 +24,7 @@ namespace FieldWorkerAssistant.Pages
         public Route()
         {
             this.InitializeComponent();
+            
         }
 
         /// <summary>

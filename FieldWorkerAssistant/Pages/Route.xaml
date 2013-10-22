@@ -8,6 +8,9 @@
     xmlns:common="using:FieldWorkerAssistant.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Esri.ArcGISRuntime.Controls"
+    xmlns:layers="using:Esri.ArcGISRuntime.Layers"
+    xmlns:data="using:Esri.ArcGISRuntime.Data"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -37,6 +40,32 @@
             <TextBlock x:Name="pageTitle" Grid.Column="1" Text="{StaticResource AppName}" Style="{StaticResource PageHeaderTextStyle}"/>
         </Grid>
 
+        <Grid Grid.Row="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <!--Offline service issues -->
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                </Grid>
+                <Grid>
+                    <controls:Map>
+                        <!--Layers-->
+                    </controls:Map>
+                </Grid>
+                <Grid>
+                    <!--Routing turn by turn-->
+                </Grid>
+            </Grid>
+        </Grid>
+        
         <VisualStateManager.VisualStateGroups>
 
             <!-- Visual states reflect the application's view state -->
