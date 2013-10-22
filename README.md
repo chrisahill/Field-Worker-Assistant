@@ -6,5 +6,6 @@
 * `Jennifer Nery`
 * `Thad Tilton`
 * `Christopher Hill`
-* `Hisham`
+* `Hisham Massih`
+* `Rich Zwapp`
 * `Don Kemlage`
