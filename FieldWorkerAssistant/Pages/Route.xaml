@@ -55,9 +55,11 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                 </Grid>
-                <Grid>
-                    <controls:Map>
+                <Grid Grid.Row="1"
+                      Grid.Column="1">
+                    <controls:Map >
                         <!--Layers-->
+                        <layers:ArcGISLocalTiledLayer Path="ms-appx:///Data/RedlandsBasemap.tpk" />
                     </controls:Map>
                 </Grid>
                 <Grid>

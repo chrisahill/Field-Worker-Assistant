@@ -147,6 +147,7 @@
       <SubType>Designer</SubType>
     </AppxManifest>
     <None Include="FieldWorkerAssistant_TemporaryKey.pfx" />
+    <Content Include="Data\RedlandsBasemap.tpk" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\Logo.png" />
