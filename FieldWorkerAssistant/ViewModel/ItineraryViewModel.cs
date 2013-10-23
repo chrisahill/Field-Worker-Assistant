@@ -192,7 +192,8 @@ namespace FieldWorkerAssistant.ViewModel
              {
                  HttpClient client = new HttpClient();
                  var result = await client.GetStreamAsync(status.ResultUri);
-                 var file = await ApplicationData.Current.LocalFolder.CreateFileAsync("Replica.geodatabase", CreationCollisionOption.OpenIfExists);
+                 App app = (App)App.Current;
+                 var file = await ApplicationData.Current.LocalFolder.CreateFileAsync("Replica.geodatabase", CreationCollisionOption.ReplaceExisting);
                  using (var stream = await file.OpenStreamForWriteAsync())
                  {
                      result.CopyTo(stream);
@@ -210,19 +211,22 @@ namespace FieldWorkerAssistant.ViewModel
              );
         }
 
-        private async Task CreateCachedFeatureLayer(StorageFile file)
+        internal async Task CreateCachedFeatureLayer(StorageFile file)
         {
-            var geodatabasePath = file.Path;
+            var fileCopy = await file.CopyAsync(ApplicationData.Current.LocalFolder,
+                System.Guid.NewGuid().ToString() + ".geodatabase");
+            var geodatabasePath = fileCopy.Path;
             var cache = await Geodatabase.OpenAsync(geodatabasePath);
             foreach (var source in cache.FeatureTables)
             {
-                CachedFeatureLayer = new ArcGISFeatureLayer(source) { ID = source.Name , Renderer = ((App)App.Current).WorkItemsRenderer};
-                var gdbFeatures = await CachedFeatureLayer.FeatureTable.QueryAsync(from item in IncludedServiceItems select (long) item.Service.OBJECTID);
-               ((App)App.Current).RouteViewModel.CachedFeatureLayer = CachedFeatureLayer;
-                ((App)App.Current).RouteViewModel.InitializeServiceItems(gdbFeatures);
-
-                Frame rootFrame = Window.Current.Content as Frame;
-                rootFrame.Navigate(typeof(FieldWorkerAssistant.Pages.Route));
+                App app = (App)App.Current;
+                CachedFeatureLayer = new ArcGISFeatureLayer(source) { ID = source.Name , Renderer = app.WorkItemsRenderer};
+                QueryFilter filter = new QueryFilter() { WhereClause = "1=1" };
+                var gdbFeatures = await CachedFeatureLayer.FeatureTable.QueryAsync(filter);
+                
+                app.RouteViewModel.CachedFeatureLayer = CachedFeatureLayer;
+                app.RouteViewModel.GdbFile = file;
+                app.RouteViewModel.InitializeServiceItems(gdbFeatures);
                 break;
             }
         }
