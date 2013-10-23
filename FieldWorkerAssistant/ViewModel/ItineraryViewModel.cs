@@ -193,8 +193,6 @@ namespace FieldWorkerAssistant.ViewModel
                  HttpClient client = new HttpClient();
                  var result = await client.GetStreamAsync(status.ResultUri);
                  App app = (App)App.Current;
-                 if (app.RouteViewModel.GdbFile != null)
-                     await app.RouteViewModel.GdbFile.DeleteAsync(StorageDeleteOption.PermanentDelete);
                  var file = await ApplicationData.Current.LocalFolder.CreateFileAsync("Replica.geodatabase", CreationCollisionOption.ReplaceExisting);
                  using (var stream = await file.OpenStreamForWriteAsync())
                  {
@@ -223,7 +221,8 @@ namespace FieldWorkerAssistant.ViewModel
             {
                 App app = (App)App.Current;
                 CachedFeatureLayer = new ArcGISFeatureLayer(source) { ID = source.Name , Renderer = app.WorkItemsRenderer};
-                var gdbFeatures = await CachedFeatureLayer.FeatureTable.QueryAsync(from item in IncludedServiceItems select (long) item.Service.OBJECTID);
+                QueryFilter filter = new QueryFilter() { WhereClause = "1=1" };
+                var gdbFeatures = await CachedFeatureLayer.FeatureTable.QueryAsync(filter);
                 
                 app.RouteViewModel.CachedFeatureLayer = CachedFeatureLayer;
                 app.RouteViewModel.GdbFile = file;
