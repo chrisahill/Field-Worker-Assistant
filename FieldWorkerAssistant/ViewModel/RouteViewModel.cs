@@ -7,6 +7,7 @@ using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.Tasks.Geocoding;
 using Esri.ArcGISRuntime.Tasks.NetworkAnalyst;
 using Esri.ArcGISRuntime.Tasks.Offline;
+using Esri.ArcGISRuntime.WebMap;
 using FieldWorkerAssistant.Model;
 using FieldWorkerAssistant.ViewModel;
 using FieldWorkerAssitant.Common;
@@ -27,12 +28,26 @@ namespace FieldWorkerAssistant
 {
     internal class RouteViewModel : INotifyPropertyChanged
     {
-
+        private LocalRouteTask _routeTask = null;
         public RouteViewModel()
         {
             RouteServiceItems = new ObservableCollection<ServiceItemViewModel>();
-            //SolveRouteCommand = new DelegateCommand(executeSolveRoute, canExecuteSolveRoute);                       
+            //SolveRouteCommand = new DelegateCommand(executeSolveRoute, canExecuteSolveRoute);                          
             SyncCommand = new DelegateCommand(syncCommand, canSyncCommand);
+            var v = InitRouteService();
+            Task.WaitAll(new[] {v});
+        }
+
+        public async Task InitRouteService()
+        {
+            //Initialize network            
+            var appResourceUri = new Uri("ms-appx:///Data/Network/CaliforniaNevada/RuntimeCANV.geodatabase");                     
+            var databasePath = await StorageFile.GetFileFromApplicationUriAsync(appResourceUri);
+            _routeTask = new LocalRouteTask(databasePath.Path, "RuntimeCANV");
+            routeParams = await _routeTask.GetDefaultParametersAsync();
+            routeParams.ReturnRoutes = true;
+            routeParams.ReturnDirections = false;
+            routeParams.ReturnStops = false;
         }
         public ObservableCollection<ServiceItemViewModel> RouteServiceItems { get; internal set; }
 
@@ -259,19 +274,16 @@ namespace FieldWorkerAssistant
             return locFile.Path;
         }
 
+        private RouteParameters routeParams;
         private async Task<Graphic> SolveRouteOffline(IEnumerable<Graphic> stops)
         {
             try
             {
-                Uri appResourceUri = new Uri("ms-appx:///Data/Network/CaliforniaNevada/RuntimeCANV.geodatabase");
-                StorageFile databasePath = await StorageFile.GetFileFromApplicationUriAsync(appResourceUri);
-                LocalRouteTask lrt = new LocalRouteTask(databasePath.Path, "RuntimeCANV");
-                RouteParameters routeParams = await lrt.GetDefaultParametersAsync();
-                routeParams.ReturnRoutes = true;
-                routeParams.ReturnDirections = true;
-                routeParams.ReturnStops = true;
+                //Uri appResourceUri = new Uri("ms-appx:///Data/Network/CaliforniaNevada/RuntimeCANV.geodatabase");
+                //StorageFile databasePath = await StorageFile.GetFileFromApplicationUriAsync(appResourceUri);
+                //LocalRouteTask lrt = new LocalRouteTask(databasePath.Path, "RuntimeCANV");                
                 routeParams.Stops = new FeaturesAsFeature(stops);
-                RouteResult result = await lrt.SolveAsync(routeParams);
+                RouteResult result = await _routeTask.SolveAsync(routeParams);
                 if (result != null && result.Routes != null)
                 {
                     return result.Routes[0].RouteGraphic;
