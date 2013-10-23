@@ -106,3 +106,14 @@ Generated_Code #added for RIA/Silverlight projects
 _UpgradeReport_Files/
 Backup*/
 UpgradeLog*.XML
+FieldWorkerAssistant/Data/Loacator/CANV/v101/CaliforniaNevadaLocator.locb
+FieldWorkerAssistant/Data/Loacator/CANV/v101/CaliforniaNevadaLocator.lox
+FieldWorkerAssistant/Data/Network/CaliforniaNevada/RuntimeCANV.geodatabase
+FieldWorkerAssistant/Data/Network/CaliforniaNevada/RuntimeCANV.tn/Routing_ND_adjacencies
+FieldWorkerAssistant/Data/Network/CaliforniaNevada/RuntimeCANV.tn/Routing_ND_edge_chains
+FieldWorkerAssistant/Data/Network/CaliforniaNevada/RuntimeCANV.tn/Routing_ND_historical_traffic
+FieldWorkerAssistant/Data/Network/CaliforniaNevada/RuntimeCANV.tn/Routing_ND_schema
+FieldWorkerAssistant/Data/Network/CaliforniaNevada/RuntimeCANV.tn/Routing_ND_source_data
+FieldWorkerAssistant/Data/Network/CaliforniaNevada/RuntimeCANV.tn/Routing_ND_weight_values
+FieldWorkerAssistant/Data/Loacator/CANV/v101/CaliforniaNevadaLocator.loc
+FieldWorkerAssistant/Data/Loacator/CANV/v101/CaliforniaNevadaLocator.loc.xml
