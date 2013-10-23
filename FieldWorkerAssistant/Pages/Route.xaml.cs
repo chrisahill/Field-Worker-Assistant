@@ -43,6 +43,7 @@ namespace FieldWorkerAssistant.Pages
             var viewModel = ((App)App.Current).RouteViewModel;
             if (!MyMap.Layers.Contains(viewModel.CachedFeatureLayer))
                 MyMap.Layers.Add(viewModel.CachedFeatureLayer);
+        
         }
 
         /// <summary>

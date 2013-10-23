@@ -72,7 +72,7 @@
                             <TextBlock Grid.Row="3" Text="Leave Time:" Margin="5" FontSize="30"/>
                             <TextBlock Grid.Row="3" Grid.Column="1" Text="Time Picker Control" Margin="5" FontSize="30" />
                             <TextBlock Grid.Row="4" Text="Status" Margin="5" FontSize="30"/>
-                            <ComboBox x:Name="StatusComboBox" Grid.Row="4" SelectedItem="{Binding Attributes[Status], Mode=OneWay}" Grid.Column="1" FontSize="30">
+                            <ComboBox x:Name="StatusComboBox" Grid.Row="4" SelectedItem="{Binding Attributes[Status], Mode=OneWay}" Grid.Column="1" FontSize="30" Margin="5">
                                 <ComboBox.Items>
                                     <x:String>New</x:String>
                                     <x:String>Open</x:String>
