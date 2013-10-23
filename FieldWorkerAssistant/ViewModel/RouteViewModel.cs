@@ -32,11 +32,8 @@ namespace FieldWorkerAssistant
         public RouteViewModel()
         {
             RouteServiceItems = new ObservableCollection<ServiceItemViewModel>();
-<<<<<<< HEAD
             SelectedRouteServiceItems = new ObservableCollection<ServiceItemViewModel>();
             SelectedRouteServiceItems.CollectionChanged += SelectedRouteServiceItems_CollectionChanged;
-            SolveRouteCommand = new DelegateCommand(executeSolveRoute, canExecuteSolveRoute);
-=======
             //SolveRouteCommand = new DelegateCommand(executeSolveRoute, canExecuteSolveRoute);                          
             SyncCommand = new DelegateCommand(syncCommand, canSyncCommand);
             var v = InitRouteService();
@@ -53,7 +50,6 @@ namespace FieldWorkerAssistant
             routeParams.ReturnRoutes = true;
             routeParams.ReturnDirections = false;
             routeParams.ReturnStops = false;
->>>>>>> 4ced8e83619348ce948db4d4aedb18a1f9182e7e
         }
 
         void SelectedRouteServiceItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -80,13 +76,11 @@ namespace FieldWorkerAssistant
                 }
             }
         }
-<<<<<<< HEAD
 
         /// <summary>
         /// Provides access to the cached feature layer as a graphics layer
         /// </summary>
         public GraphicsLayer CachedGraphicsLayer { get; internal set; }
-=======
         
         private GraphicsLayer m_RouteLayer;
         public GraphicsLayer RouteLayer
@@ -99,9 +93,9 @@ namespace FieldWorkerAssistant
                     {
                         Symbol = new SimpleLineSymbol
                         {
-                            Color = Colors.DodgerBlue,
+                            Color = Colors.DarkBlue,
                             Style = SimpleLineStyle.Solid,
-                            Width = 2
+                            Width = 5
                         }
                     }
                 });
@@ -130,7 +124,6 @@ namespace FieldWorkerAssistant
                 OnPropertyChanged();
             }
         }
->>>>>>> 4ced8e83619348ce948db4d4aedb18a1f9182e7e
 
         public void InitializeServiceItems(IEnumerable<Feature> features)
         {
@@ -222,6 +215,7 @@ namespace FieldWorkerAssistant
         internal async void executeSolveRoute(IEnumerable<Graphic> stops)
         {
             Graphic graphicRoute = await SolveRouteOffline(stops);
+            graphicRoute.Geometry = GeometryEngine.Project(graphicRoute.Geometry, SpatialReferences.WebMercator);
             RouteLayer.Graphics.Clear();
             RouteLayer.Graphics.Add(graphicRoute);            
         }

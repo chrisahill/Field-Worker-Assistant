@@ -68,15 +68,16 @@
                             <TextBlock Grid.Row="1" Text="Description:" Margin="5" FontSize="30"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Attributes[ProblemDescription]}" Margin="5" FontSize="30" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="2" Text="Arrival Time:" Margin="5" FontSize="30"/>
-                            <TextBlock Grid.Row="2" Grid.Column="1" Text="Time Picker Control" Margin="5" FontSize="30" />
+                            <TextBlock Grid.Row="2" x:Name="StartTimeTextBlock" Grid.Column="1" Text="Time Picker Control" Margin="5" FontSize="30" />
                             <TextBlock Grid.Row="3" Text="Leave Time:" Margin="5" FontSize="30"/>
-                            <TextBlock Grid.Row="3" Grid.Column="1" Text="Time Picker Control" Margin="5" FontSize="30" />
+                            <TextBlock Grid.Row="3" x:Name="EndTimeTextBlock" Grid.Column="1" Text="Time Picker Control" Margin="5" FontSize="30" />
                             <TextBlock Grid.Row="4" Text="Status" Margin="5" FontSize="30"/>
                             <ComboBox x:Name="StatusComboBox" Grid.Row="4" SelectedItem="{Binding Attributes[Status], Mode=OneWay}" Grid.Column="1" FontSize="30" Margin="5">
                                 <ComboBox.Items>
                                     <x:String>New</x:String>
                                     <x:String>Open</x:String>
                                     <x:String>Pending</x:String>
+                                    <x:String>Closed</x:String>
                                 </ComboBox.Items>
                             </ComboBox>
                             <TextBlock Grid.Row="5" Text="Actions Taken:" Margin="5" FontSize="30"/>
