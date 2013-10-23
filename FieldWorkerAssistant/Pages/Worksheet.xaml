@@ -9,6 +9,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:converters="using:FieldWorkerAssistant.Converters"
+    xmlns:controls="using:Esri.ArcGISRuntime.Controls"
+    xmlns:symbology="using:Esri.ArcGISRuntime.Symbology"
+    xmlns:layers="using:Esri.ArcGISRuntime.Layers"
     mc:Ignorable="d">
 
     <Page.Resources>        
@@ -91,8 +94,15 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*"  />
                 </Grid.RowDefinitions>
-                <Rectangle Width="250" Height="250" Fill="#333333" Margin="100,50,100,10" />
-                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="Mini Map" FontSize="24" Margin="100,50,100,10" />
+               
+                    <controls:Map x:Name="mySmallMap" Width="250" Height="250" Margin="100,50,100,10">
+                        <!--Layers-->
+                        <layers:ArcGISLocalTiledLayer Path="ms-appx:///Data/RedlandsBasemap.tpk" />
+                    <layers:GraphicsLayer ID="SelectedItemsLayer" Renderer="{StaticResource WorkItemsRenderer}" />
+                   
+                </controls:Map>
+                <!--<Rectangle Width="250" Height="250" Fill="#333333" Margin="100,50,100,10" />-->
+                <!--<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="Mini Map" FontSize="24" Margin="100,50,100,10" />-->
                 <Grid Grid.Row="1">
                     <StackPanel MaxWidth="250">
                         <TextBlock Text="{Binding Attributes[Address]}" TextWrapping="Wrap" FontSize="24" Margin="10"/>

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 using Windows.UI.Xaml.Navigation;
 using Esri.ArcGISRuntime.Data;
+using Esri.ArcGISRuntime.Layers;
 using FieldWorkerAssistant.Common;
 
 namespace FieldWorkerAssistant.Pages
@@ -31,7 +33,13 @@ namespace FieldWorkerAssistant.Pages
 
             var clock = new DispatcherTimer {Interval = new TimeSpan(0,0,1,0,0)};
             clock.Tick += (s, e) => { pageTime.Text = DateTime.Now.ToString("h:mm tt"); };
-            clock.Start();            
+            clock.Start();
+
+            var gr = feature.AsGraphic();
+            gr.Attributes.Remove(gr.Attributes.FirstOrDefault(kvp => kvp.Key == "GlobalID"));            
+
+            var gl = mySmallMap.Layers["SelectedItemsLayer"] as GraphicsLayer;
+            gl.Graphics.Add(gr);
 
         }
 
