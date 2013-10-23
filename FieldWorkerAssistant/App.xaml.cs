@@ -1,4 +1,5 @@
-﻿using Esri.ArcGISRuntime.Symbology;
+﻿using Esri.ArcGISRuntime.Data;
+using Esri.ArcGISRuntime.Symbology;
 using FieldWorkerAssistant.Common;
 using FieldWorkerAssistant.ViewModel;
 using System;
@@ -98,7 +99,9 @@ namespace FieldWorkerAssistant
         }
 
         internal ItineraryViewModel ItineraryViewModel { get; private set; }
-
+        
+        internal GdbFeature SelectedFeature { get; set; }
+        
         internal Renderer WorkItemsRenderer { get; private set; }
 
         /// <summary>
