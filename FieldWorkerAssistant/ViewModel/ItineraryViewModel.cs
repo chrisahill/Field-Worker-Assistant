@@ -1,14 +1,14 @@
-<<<<<<< HEAD
+
 ﻿using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Layers;
 using Esri.ArcGISRuntime.Tasks.Geocoding;
 using Esri.ArcGISRuntime.Tasks.NetworkAnalyst;
-=======
+
 ﻿using Esri.ArcGISRuntime.Data;
 using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Layers;
 using Esri.ArcGISRuntime.Tasks.Offline;
->>>>>>> 17d6f52de885599691c5d7122395ebcdefc29d57
+
 using FieldWorkerAssistant.Model;
 using FieldWorkerAssitant.Common;
 using System;
@@ -24,14 +24,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage;
-<<<<<<< HEAD
-=======
+
 using System.IO;
 using System.Threading;
 using Windows.UI.Xaml.Controls;
 using FieldWorkerAssistant.Pages;
 using Windows.UI.Xaml;
->>>>>>> 17d6f52de885599691c5d7122395ebcdefc29d57
+
 
 namespace FieldWorkerAssistant.ViewModel
 {
@@ -74,16 +73,13 @@ namespace FieldWorkerAssistant.ViewModel
 
             IncludeAllCommand = new DelegateCommand(includeAll, canIncludeAll);
             ExcludeAllCommand = new DelegateCommand(excludeAll, canExcludeAll);
-<<<<<<< HEAD
             SolveRouteCommand = new DelegateCommand(executeSolveRoute, canExecuteSolveRoute);
-=======
             DownloadCommand = new DelegateCommand(download, canDownload);
         }
 
         void AllServiceItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             OnPropertyChanged("AllServiceItems");
->>>>>>> 17d6f52de885599691c5d7122395ebcdefc29d57
         }
 
         void IncludedServiceItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -122,7 +118,6 @@ namespace FieldWorkerAssistant.ViewModel
 
         public ICommand ExcludeAllCommand { get; private set; }
 
-<<<<<<< HEAD
         public ICommand SolveRouteCommand { get; private set; }
 
         private bool canExecuteSolveRoute(object parameter)
@@ -224,7 +219,7 @@ namespace FieldWorkerAssistant.ViewModel
         private async Task AddGraphicLayer(List<Graphic> graphicList)
         {
             //TODO
-=======
+        }
         public ICommand DownloadCommand { get; private set; }
 
         public void InitializeServiceItems(IEnumerable<Feature> features)
@@ -242,7 +237,6 @@ namespace FieldWorkerAssistant.ViewModel
                 var viewModel = new ServiceItemViewModel(serviceItem);
                 AllServiceItems.Add(viewModel);
             }
->>>>>>> 17d6f52de885599691c5d7122395ebcdefc29d57
         }
 
         private bool canIncludeAll(object parameter)
@@ -298,11 +292,13 @@ namespace FieldWorkerAssistant.ViewModel
                      result.CopyTo(stream);
                  }
                  await CreateCachedFeatureLayer(file);
-             }, TimeSpan.FromSeconds(2), CancellationToken.None,
-             (status) => //status updates
-             {
+             }, TimeSpan.FromSeconds(2), CancellationToken.None
+             //,
+             //(status) => //status updates
+             //{
 
-             });
+             //}
+             );
         }
 
         private async Task CreateCachedFeatureLayer(StorageFile file)
@@ -317,7 +313,7 @@ namespace FieldWorkerAssistant.ViewModel
                 ((App)App.Current).RouteViewModel.InitializeServiceItems(gdbFeatures);
 
                 Frame rootFrame = Window.Current.Content as Frame;
-                rootFrame.Navigate(typeof(Route));
+                rootFrame.Navigate(typeof(FieldWorkerAssistant.Pages.Route));
                 break;
             }
         }
