@@ -1,18 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
+using Windows.UI.Xaml.Navigation;
+using Esri.ArcGISRuntime.Data;
+using FieldWorkerAssistant.Common;
 
 namespace FieldWorkerAssistant.Pages
 {
@@ -21,9 +14,22 @@ namespace FieldWorkerAssistant.Pages
     /// </summary>
     public sealed partial class Worksheet : FieldWorkerAssistant.Common.LayoutAwarePage
     {
+        private GdbFeature feature;
+
         public Worksheet()
         {
             this.InitializeComponent();
+
+            feature = ((App)(App.Current)).SelectedFeature;
+            this.DataContext = feature;
+
+            pageDate.Text = DateTime.Now.ToString("M");
+            pageTime.Text = DateTime.Now.ToString("h:mm tt");
+
+            var clock = new DispatcherTimer {Interval = new TimeSpan(0,0,1,0,0)};
+            clock.Tick += (s, e) => { pageTime.Text = DateTime.Now.ToString("h:mm tt"); };
+            clock.Start();            
+
         }
 
         /// <summary>
@@ -47,6 +53,12 @@ namespace FieldWorkerAssistant.Pages
         /// <param name="pageState">An empty dictionary to be populated with serializable state.</param>
         protected override void SaveState(Dictionary<String, Object> pageState)
         {
+        }      
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            feature.Attributes["Status"] = StatusComboBox.SelectedItem;
+            feature.Attributes["ActionTaken"] = ActionTakenTextBox.Text;
         }
     }
 }

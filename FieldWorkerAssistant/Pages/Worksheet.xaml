@@ -8,11 +8,12 @@
     xmlns:common="using:FieldWorkerAssistant.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:FieldWorkerAssistant.Converters"
     mc:Ignorable="d">
 
-    <Page.Resources>
-
-        <!-- TODO: Delete this line if the key AppName is declared in App.xaml -->
+    <Page.Resources>        
+            <converters:PriorityToBrushConverter x:Key="PriorityToColorConverter" />
+            <!-- TODO: Delete this line if the key AppName is declared in App.xaml -->
         <x:String x:Key="AppName">Worksheet</x:String>
     </Page.Resources>
 
@@ -37,8 +38,8 @@
             </Grid.ColumnDefinitions>
             <Button x:Name="backButton" Click="GoBack" IsEnabled="{Binding Frame.CanGoBack, ElementName=pageRoot}" Style="{StaticResource BackButtonStyle}"/>
             <TextBlock x:Name="pageTitle" Grid.Column="1" Text="{StaticResource AppName}" Style="{StaticResource PageHeaderTextStyle}"/>
-            <TextBlock x:Name="pageDate" Grid.Column="2" Text="Oct 21" Style="{StaticResource PageHeaderTextStyle}" HorizontalAlignment="Right"/>
-            <TextBlock x:Name="pageTime" Grid.Column="3" Foreground="#3388ff" Text="11:05 AM" Style="{StaticResource PageHeaderTextStyle}" HorizontalAlignment="Right"/>
+            <TextBlock x:Name="pageDate" Grid.Column="2" Style="{StaticResource PageHeaderTextStyle}" HorizontalAlignment="Right"/>
+            <TextBlock x:Name="pageTime" Grid.Column="3" Foreground="#3388ff" Style="{StaticResource PageHeaderTextStyle}" HorizontalAlignment="Right"/>
         </Grid>
 
         <Grid Grid.Row="1">
@@ -60,17 +61,25 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0"  Text="Priority:" Margin="5" FontSize="30"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="High" Foreground="#ff3344" Margin="5" FontSize="30" />                        
+                            <TextBlock Grid.Row="0" Text="Severity:" Margin="5" FontSize="30"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Attributes[Severity]}" Foreground="{Binding Attributes[Severity], Converter={StaticResource PriorityToColorConverter}}" Margin="5" FontSize="30" />                        
                             <TextBlock Grid.Row="1" Text="Description:" Margin="5" FontSize="30"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="This is description text that explains the problem and what needs to be done or something like that ^_^" Margin="5" FontSize="30" TextWrapping="Wrap"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Attributes[ProblemDescription]}" Margin="5" FontSize="30" TextWrapping="Wrap"/>
                             <TextBlock Grid.Row="2" Text="Arrival Time:" Margin="5" FontSize="30"/>
                             <TextBlock Grid.Row="2" Grid.Column="1" Text="Time Picker Control" Margin="5" FontSize="30" />
                             <TextBlock Grid.Row="3" Text="Leave Time:" Margin="5" FontSize="30"/>
                             <TextBlock Grid.Row="3" Grid.Column="1" Text="Time Picker Control" Margin="5" FontSize="30" />
-                            <TextBlock Grid.Row="4" Text="Actions Taken:" Margin="5" FontSize="30"/>
-                            <TextBox Grid.Row="4" Grid.Column="1" Text="Used the repair tool and fixed all problems.. the repair tool fixes everything!!!" Margin="5" Height="300" FontSize="24" AcceptsReturn="True" TextWrapping="Wrap" />
+                            <TextBlock Grid.Row="4" Text="Status" Margin="5" FontSize="30"/>
+                            <ComboBox x:Name="StatusComboBox" Grid.Row="4" SelectedItem="{Binding Attributes[Status], Mode=OneWay}" Grid.Column="1" FontSize="30">
+                                <ComboBox.Items>
+                                    <x:String>Open</x:String>
+                                    <x:String>Closed</x:String>
+                                </ComboBox.Items>
+                            </ComboBox>
+                            <TextBlock Grid.Row="5" Text="Actions Taken:" Margin="5" FontSize="30"/>
+                            <TextBox x:Name="ActionTakenTextBox" Grid.Row="5" Grid.Column="1" Text="{Binding Attributes[ActionTaken], Mode=OneWay}"  Margin="5" Height="300" FontSize="24" AcceptsReturn="True" TextWrapping="Wrap" />
                         </Grid>
                     </StackPanel>                                            
                 </ScrollViewer>
@@ -124,7 +133,7 @@
     <common:LayoutAwarePage.BottomAppBar>
         <AppBar IsSticky="True" IsOpen="True" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" BorderBrush="Transparent">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Save" />                
+                <Button Content="Save" Click="Save_Click" />                
             </StackPanel>
         </AppBar>
     </common:LayoutAwarePage.BottomAppBar>
