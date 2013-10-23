@@ -3,6 +3,7 @@ using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Layers;
 using Esri.ArcGISRuntime.Tasks.Geocoding;
 using Esri.ArcGISRuntime.Tasks.NetworkAnalyst;
+using Esri.ArcGISRuntime.Tasks.Offline;
 using FieldWorkerAssistant.Model;
 using FieldWorkerAssistant.ViewModel;
 using FieldWorkerAssitant.Common;
@@ -17,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage;
+using Windows.UI.Xaml;
 
 namespace FieldWorkerAssistant
 {
@@ -27,6 +29,7 @@ namespace FieldWorkerAssistant
         {
             RouteServiceItems = new ObservableCollection<ServiceItemViewModel>();
             SolveRouteCommand = new DelegateCommand(executeSolveRoute, canExecuteSolveRoute);
+            SyncCommand = new DelegateCommand(syncCommand, canSyncCommand);
         }
         public ObservableCollection<ServiceItemViewModel> RouteServiceItems { get; internal set; }
 
@@ -47,6 +50,57 @@ namespace FieldWorkerAssistant
                 }
             }
         }
+
+        private GraphicsLayer m_GPSLayer;
+        public GraphicsLayer GPSLayer
+        {
+            get
+            {
+                return m_GPSLayer;
+            }
+            internal set
+            {
+                if (m_GPSLayer != value)
+                {
+                    m_GPSLayer = value;                    
+
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private GraphicsLayer m_RouteLayer;
+        public GraphicsLayer RouteLayer
+        {
+            get
+            {
+                return m_RouteLayer;
+            }
+            internal set
+            {
+                if (m_RouteLayer != value)
+                {
+                    m_RouteLayer = value;
+
+                    OnPropertyChanged();
+                }
+            }
+        }
+        
+
+        private bool m_HasChanges;
+
+        public bool HasChanges
+        {
+            get { return m_HasChanges; }
+            internal set
+            {
+                if (m_HasChanges != value)
+                    m_HasChanges = value;
+                OnPropertyChanged();
+            }
+        }
+
         public void InitializeServiceItems(IEnumerable<Feature> features)
         {
             ServiceItemViewModel[] allItemsCopy = RouteServiceItems.ToArray();
@@ -56,7 +110,7 @@ namespace FieldWorkerAssistant
             foreach (var feature in features)
             {
                 var serviceItem = new ServiceItem(feature);
-                var viewModel = new ServiceItemViewModel(serviceItem);
+                var viewModel = new ServiceItemViewModel(serviceItem);                
                 RouteServiceItems.Add(viewModel);
             }
         }
@@ -70,6 +124,59 @@ namespace FieldWorkerAssistant
         public ICommand SolveRouteCommand { get; private set; }
         public ICommand GeocodeCommand { get; private set; }
         public ICommand ReverseGeocodeCommand { get; private set; }
+        public ICommand SyncCommand { get; private set; }
+        public bool HasEdit { get; internal set; }
+        private bool canSyncCommand(object parameter)
+        {
+            return CachedFeatureLayer != null && CachedFeatureLayer.FeatureTable != null && GdbFile != null && HasEdit;
+        }
+        private async void syncCommand(object parameter)
+        {
+            if (!canSyncCommand(parameter))
+                return;
+            string serviceTaskUri = ((App)App.Current).FeatureServiceUri;
+            var task = new GeodatabaseTask(new Uri(serviceTaskUri));
+            SyncGeodatabaseParameters parameters = new SyncGeodatabaseParameters()
+            {
+                SyncDirection = SyncDirection.Bidirectional
+            };
+            var result = await task.SubmitSyncJobAsync(parameters, GdbFile.Path,
+                (status, err) =>
+                { 
+                    IsSynching = false;
+                },
+                (uploadResult) =>  //delta uploaded
+                {
+                    
+                }, TimeSpan.FromSeconds(2),
+                (status) =>
+                { //status updates
+                },
+                CancellationToken.None);
+        }
+
+        private bool m_IsSynching;
+        public bool IsSynching
+        {
+            get { return m_IsSynching; }
+            private set
+            {
+                if (m_IsSynching != value)
+                {
+                    m_IsSynching = value;
+                    OnPropertyChanged();
+                    raiseCanExecuteChanged();
+                }
+            }
+        }
+
+        private void raiseCanExecuteChanged()
+        {
+            ((DelegateCommand)GeocodeCommand).RaiseCanExecuteChanged();
+            ((DelegateCommand)ReverseGeocodeCommand).RaiseCanExecuteChanged();
+            ((DelegateCommand)SyncCommand).RaiseCanExecuteChanged();
+        }
+
 
         /// <summary>
         /// Gets the file underlying the <see cref="CachedFeatureLayer"/>
@@ -190,7 +297,7 @@ namespace FieldWorkerAssistant
 
             return stops;
         }
-
+        
         private async Task AddGraphicLayer(List<Graphic> graphicList)
         {
             //TODO
