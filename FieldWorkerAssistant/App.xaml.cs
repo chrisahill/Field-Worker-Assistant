@@ -104,6 +104,9 @@ namespace FieldWorkerAssistant
         
         internal Renderer WorkItemsRenderer { get; private set; }
 
+        // Stores whether the user has logged in to the app
+        internal bool LoggedIn { get; set; }
+
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used when the application is launched to open a specific file, to display

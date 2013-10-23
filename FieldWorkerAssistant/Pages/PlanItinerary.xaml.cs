@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Security.Credentials.UI;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -33,8 +34,15 @@ namespace FieldWorkerAssistant.Pages
         public PlanItinerary()
         {
             this.InitializeComponent();
+        }
 
-            var viewModel = ((App)App.Current).ItineraryViewModel;
+        protected async override void OnNavigatedTo(NavigationEventArgs args)
+        {
+            base.OnNavigatedTo(args);
+
+            App app = (App)App.Current;
+
+            var viewModel = app.ItineraryViewModel;
             this.DataContext = viewModel;
 
             MainMap.InitialExtent = new Envelope(-13046907.1247363, 4034314.00501996, -13042604.5495666, 4038309.25339177,
@@ -58,9 +66,10 @@ namespace FieldWorkerAssistant.Pages
             }
             else
             {
-                workItemsLayer.Graphics.CollectionChanged += (o, e) => 
+                workItemsLayer.Graphics.CollectionChanged += (o, e) =>
                     viewModel.InitializeServiceItems(workItemsLayer.Graphics);
             }
+
         }
 
         void WorkItemsLayer_Tapped(object sender, GraphicTappedRoutedEventArgs e)

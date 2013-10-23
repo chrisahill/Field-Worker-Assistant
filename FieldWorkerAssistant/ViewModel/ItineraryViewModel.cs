@@ -68,6 +68,7 @@ namespace FieldWorkerAssistant.ViewModel
 
         void AllServiceItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            raiseCanExecuteChanged();
             OnPropertyChanged("AllServiceItems");
         }
 
@@ -106,9 +107,23 @@ namespace FieldWorkerAssistant.ViewModel
         public ICommand IncludeAllCommand { get; private set; }
 
         public ICommand ExcludeAllCommand { get; private set; }
-
         
         public ICommand DownloadCommand { get; private set; }
+
+        private bool m_downloading;
+        public bool IsDownloading
+        {
+            get { return m_downloading; }
+            private set
+            {
+                if (m_downloading != value)
+                {
+                    m_downloading = value;
+                    OnPropertyChanged();
+                    raiseCanExecuteChanged();
+                }
+            }
+        }
 
         public void InitializeServiceItems(IEnumerable<Feature> features)
         {
@@ -129,7 +144,8 @@ namespace FieldWorkerAssistant.ViewModel
 
         private bool canIncludeAll(object parameter)
         {
-            return AllServiceItems.Where(item => !IncludedServiceItems.Contains(item)).Count() > 0;
+            var anyExcludedItems = AllServiceItems.Any(item => !IncludedServiceItems.Contains(item));
+            return !IsDownloading && anyExcludedItems;
         }
 
         private void includeAll(object parameter)
@@ -143,7 +159,7 @@ namespace FieldWorkerAssistant.ViewModel
 
         private bool canExcludeAll(object parameter)
         {
-            return IncludedServiceItems.Count > 0;
+            return !IsDownloading && IncludedServiceItems.Count > 0;
         }
 
         private void excludeAll(object parameter)
@@ -159,11 +175,13 @@ namespace FieldWorkerAssistant.ViewModel
 
         private bool canDownload(object parameter)
         {
-            return IncludedServiceItems.Count > 0;
+            return !IsDownloading && IncludedServiceItems.Count > 0;
         }
 
         private async void download(object parameter)
         {
+            IsDownloading = true;
+
             var task = new GeodatabaseTask(new Uri(FeatureServiceUri));
             var layerQueries = new Dictionary<int, LayerQuery>();
             var ids = from item in IncludedServiceItems select (long)item.Service.OBJECTID;
@@ -180,6 +198,9 @@ namespace FieldWorkerAssistant.ViewModel
                      result.CopyTo(stream);
                  }
                  await CreateCachedFeatureLayer(file);
+
+                 IsDownloading = false;
+
              }, TimeSpan.FromSeconds(2), CancellationToken.None
              //,
              //(status) => //status updates

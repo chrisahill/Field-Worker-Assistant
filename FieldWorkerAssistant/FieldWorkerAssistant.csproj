@@ -123,6 +123,7 @@
     <Compile Include="Common\AttachedProperties.cs" />
     <Compile Include="Common\RichTextColumns.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\PriorityToBrushConverter.cs" />
     <Compile Include="Converters\ServiceItemsToFeatures.cs" />
     <Compile Include="Model\ServiceItem.cs" />

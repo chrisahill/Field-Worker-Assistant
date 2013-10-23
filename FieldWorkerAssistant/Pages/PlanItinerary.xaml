@@ -21,10 +21,10 @@
         <commands:SelectAllCommand x:Key="SelectAllCommand" />
         <commands:ClearSelectedCommand x:Key="ClearSelectedCommand" />
         <Grid x:Key="DataContextProxy" Tag="{Binding}" />
-        <converters:ServiceItemsToFeatures x:Key="ServiceItemsToFeaturesConverter" />
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         
         <!-- TODO: Delete this line if the key AppName is declared in App.xaml -->
-        <x:String x:Key="AppName">Select Itinerary Items</x:String>
+        <x:String x:Key="AppName">Select Service Items for Itinerary</x:String>
        
     </Page.Resources>
 
@@ -53,61 +53,60 @@
             <TextBlock x:Name="pageTitle" Grid.Column="1" Text="{StaticResource AppName}" Style="{StaticResource PageHeaderTextStyle}"/>
         </Grid>
 
-        <Grid Grid.Row="1">
-            <ListBox ItemsSource="{Binding AllServiceItems}" 
-                     Background="Transparent" 
-                     Style="{StaticResource ItineraryItemsListBoxStyle}"
-                     SelectionMode="Multiple"
-                     common:AttachedProperties.SelectedItemsSource="{Binding IncludedServiceItems}">                
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <CheckBox x:Name="IncludedCheckBox"
-                                IsChecked="{Binding Included, Mode=TwoWay}"
-                                IsHitTestVisible="False"
-                                        Margin="0,5,0,5">
-                                <CheckBox.RenderTransform>
-                                    <ScaleTransform CenterX="10" CenterY="10"
-                                                    ScaleX="1.4" ScaleY="1.4" />
-                                </CheckBox.RenderTransform>
-                            </CheckBox>
-                            <TextBlock 
-                                Margin="20,5,0,5" 
-                                FontSize="30" 
-                                Foreground="White" 
-                                Opacity="0.7"
-                                VerticalAlignment="Center" 
-                                Text="{Binding Service.ServiceRequestID}" 
-                                Width="100" 
-                                Grid.Column="1"/>
-                            <TextBlock 
-                                Margin="10,5,0,5" 
-                                FontSize="30" 
-                                Foreground="{Binding Service.Severity,
-                                    Converter={StaticResource PriorityToColorConverter}}" 
-                                VerticalAlignment="Center" 
-                                Text="{Binding Service.Severity}" 
-                                Width="125"
-                                Grid.Column="2"/>
-                            <TextBlock 
-                                Margin="10,5,0,5" 
-                                FontSize="30" 
-                                Foreground="White" 
-                                VerticalAlignment="Center" 
-                                Text="{Binding Service.ProblemDescription}" 
-                                TextWrapping="Wrap"
-                                Grid.Column="3"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </Grid>
+        <ListBox ItemsSource="{Binding AllServiceItems}" 
+                    Background="Transparent" 
+                    Style="{StaticResource ItineraryItemsListBoxStyle}"
+                    SelectionMode="Multiple"
+                    Grid.Row="1"
+                    common:AttachedProperties.SelectedItemsSource="{Binding IncludedServiceItems}">                
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox x:Name="IncludedCheckBox"
+                            IsChecked="{Binding Included, Mode=TwoWay}"
+                            IsHitTestVisible="False"
+                                    Margin="0,5,0,5">
+                            <CheckBox.RenderTransform>
+                                <ScaleTransform CenterX="10" CenterY="10"
+                                                ScaleX="1.4" ScaleY="1.4" />
+                            </CheckBox.RenderTransform>
+                        </CheckBox>
+                        <TextBlock 
+                            Margin="20,5,0,5" 
+                            FontSize="30" 
+                            Foreground="White" 
+                            Opacity="0.7"
+                            VerticalAlignment="Center" 
+                            Text="{Binding Service.ServiceRequestID}" 
+                            Width="100" 
+                            Grid.Column="1"/>
+                        <TextBlock 
+                            Margin="10,5,0,5" 
+                            FontSize="30" 
+                            Foreground="{Binding Service.Severity,
+                                Converter={StaticResource PriorityToColorConverter}}" 
+                            VerticalAlignment="Center" 
+                            Text="{Binding Service.Severity}" 
+                            Width="125"
+                            Grid.Column="2"/>
+                        <TextBlock 
+                            Margin="10,5,0,5" 
+                            FontSize="30" 
+                            Foreground="White" 
+                            VerticalAlignment="Center" 
+                            Text="{Binding Service.ProblemDescription}" 
+                            TextWrapping="Wrap"
+                            Grid.Column="3"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
         <esri:Map x:Name="MainMap"
                   Grid.Column="1"
@@ -145,6 +144,26 @@
             </esriLayers:GraphicsLayer>
 
         </esri:Map>
+        
+        <Grid Background="#CC000000"
+              Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVisibilityConverter}}"
+              Grid.Row="1"
+              Grid.ColumnSpan="2">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock Text="Downloading selected service items..."
+                       FontSize="30"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Bottom"
+                       Margin="0,0,0,5"/>
+            <ProgressBar IsIndeterminate="True"
+                         HorizontalAlignment="Stretch"
+                         VerticalAlignment="Top"
+                         Margin="0,5,0,0"
+                         Grid.Row="1"/>
+        </Grid>
         <VisualStateManager.VisualStateGroups>
 
             <!-- Visual states reflect the application's view state -->
