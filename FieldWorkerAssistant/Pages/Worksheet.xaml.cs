@@ -6,6 +6,7 @@ using Windows.UI.Xaml.Controls;
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 using Windows.UI.Xaml.Navigation;
 using Esri.ArcGISRuntime.Data;
+using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Layers;
 using FieldWorkerAssistant.Common;
 
@@ -36,8 +37,15 @@ namespace FieldWorkerAssistant.Pages
             clock.Start();
 
             var gr = feature.AsGraphic();
-            gr.Attributes.Remove(gr.Attributes.FirstOrDefault(kvp => kvp.Key == "GlobalID"));            
-
+            gr.Attributes.Remove(gr.Attributes.FirstOrDefault(kvp => kvp.Key == "GlobalID"));
+            double xmin, xmax, ymin, ymax;
+            var point = (MapPoint) gr.Geometry;
+            xmin = point.X - 1000;
+            xmax = point.X + 1000;
+            ymin = point.Y - 1000;
+            ymax = point.Y + 1000;
+            mySmallMap.InitialExtent = new Envelope(xmin, ymin, xmax, ymax, SpatialReferences.WebMercator);
+            mySmallMap.IsHitTestVisible = false;
             var gl = mySmallMap.Layers["SelectedItemsLayer"] as GraphicsLayer;
             gl.Graphics.Add(gr);
 
