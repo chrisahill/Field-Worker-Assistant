@@ -18,6 +18,9 @@ using System.Windows.Input;
 using Windows.Storage;
 using System.IO;
 using System.Threading;
+using Windows.UI.Xaml.Controls;
+using FieldWorkerAssistant.Pages;
+using Windows.UI.Xaml;
 
 namespace FieldWorkerAssistant.ViewModel
 {
@@ -160,39 +163,27 @@ namespace FieldWorkerAssistant.ViewModel
 
         private async void download(object parameter)
         {
-            StorageFile file = null;
-            try
-            {
-                file = await ApplicationData.Current.LocalFolder.GetFileAsync("Replica.geodatabase");
-            }
-            catch
-            {
-            }
-            if (file == null)
-            {
-                var task = new GeodatabaseTask(new Uri(FeatureServiceUri));
-                var jobresult = await task.SubmitGenerateGeodatabaseJobAsync(
-                 new GenerateGeodatabaseParameters(new int[] { 0 }, MapExtent) { SyncModel = SyncModel.PerLayer },
-                 async (status, error) => //complete callback
+            var task = new GeodatabaseTask(new Uri(FeatureServiceUri));
+            var layerQueries = new Dictionary<int, LayerQuery>();
+            var ids = from item in IncludedServiceItems select (long)item.Service.OBJECTID;
+            layerQueries[0] = new LayerQuery() { Where = string.Format("OBJECTID IN ({0})", string.Join(",", ids)) };
+            var jobresult = await task.SubmitGenerateGeodatabaseJobAsync(
+             new GenerateGeodatabaseParameters(new int[] { 0}, MapExtent.Expand(5)) { SyncModel = SyncModel.PerLayer, LayerQueries = layerQueries },
+             async (status, error) => //complete callback
+             {
+                 HttpClient client = new HttpClient();
+                 var result = await client.GetStreamAsync(status.ResultUri);
+                 var file = await ApplicationData.Current.LocalFolder.CreateFileAsync("Replica.geodatabase", CreationCollisionOption.OpenIfExists);
+                 using (var stream = await file.OpenStreamForWriteAsync())
                  {
-                     HttpClient client = new HttpClient();
-                     var result = await client.GetStreamAsync(status.ResultUri);
-                     file = await ApplicationData.Current.LocalFolder.CreateFileAsync("Replica.geodatabase", CreationCollisionOption.OpenIfExists);
-                     using (var stream = await file.OpenStreamForWriteAsync())
-                     {
-                         result.CopyTo(stream);
-                     }
-                     await CreateCachedFeatureLayer(file);
-                 }, TimeSpan.FromSeconds(2), CancellationToken.None,
-                 (status) => //status updates
-                 {
-                     
-                 });
-            }
-            else
-            {
-                await CreateCachedFeatureLayer(file);
-            }
+                     result.CopyTo(stream);
+                 }
+                 await CreateCachedFeatureLayer(file);
+             }, TimeSpan.FromSeconds(2), CancellationToken.None,
+             (status) => //status updates
+             {
+
+             });
         }
 
         private async Task CreateCachedFeatureLayer(StorageFile file)
@@ -204,7 +195,10 @@ namespace FieldWorkerAssistant.ViewModel
                 CachedFeatureLayer = new ArcGISFeatureLayer(source) { ID = source.Name , Renderer = ((App)App.Current).WorkItemsRenderer};
                 var gdbFeatures = await CachedFeatureLayer.FeatureTable.QueryAsync(from item in IncludedServiceItems select (long) item.Service.OBJECTID);
                ((App)App.Current).RouteViewModel.CachedFeatureLayer = CachedFeatureLayer;
-               ((App)App.Current).RouteViewModel.InitializeServiceItems(gdbFeatures);
+                ((App)App.Current).RouteViewModel.InitializeServiceItems(gdbFeatures);
+
+                Frame rootFrame = Window.Current.Content as Frame;
+                rootFrame.Navigate(typeof(Route));
                 break;
             }
         }

@@ -62,11 +62,11 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>                                   
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>                                   
                                     <TextBlock Margin="20,5,0,5"
                                                FontSize="30"
                                                Foreground="White"
@@ -74,7 +74,7 @@
                                                VerticalAlignment="Center"
                                                Text="{Binding Service.ServiceRequestID}"
                                                Width="100"
-                                               Grid.Column="0" />
+                                               Grid.Row="0" />
                                     <TextBlock Margin="10,5,0,5"
                                                FontSize="30"
                                                Foreground="{Binding Service.Severity,
@@ -82,14 +82,14 @@
                                                VerticalAlignment="Center"
                                                Text="{Binding Service.Severity}"
                                                Width="125"
-                                               Grid.Column="1" />
+                                               Grid.Row="1" />
                                     <TextBlock Margin="10,5,0,5"
                                                FontSize="30"
                                                Foreground="White"
                                                VerticalAlignment="Center"
                                                Text="{Binding Service.ProblemDescription}"
                                                TextWrapping="Wrap"
-                                               Grid.Column="2" />
+                                               Grid.Row="2" />
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
