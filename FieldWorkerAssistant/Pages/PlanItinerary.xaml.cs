@@ -50,11 +50,10 @@ namespace FieldWorkerAssistant.Pages
             viewModel.PropertyChanged -= viewModel_PropertyChanged;
             viewModel.PropertyChanged += viewModel_PropertyChanged;
 
-            MainMap.InitialExtent = new Envelope(-13046907.1247363, 4034314.00501996, -13042604.5495666, 4038309.25339177,
-                SpatialReferences.WebMercator);
+            MainMap.InitialExtent = app.DefaultExtent;
 
-            // Bind source of all items and included items - need to do it in code behind because it can't be 
-            // done in XAML
+            // Bind included items layer's graphics source to included items collection - need to do it in 
+            // code behind because it can't be done in XAML
             GraphicsLayer includedItemsLayer = (GraphicsLayer)MainMap.Layers["IncludedItemsLayer"];
             Binding b = new Binding()
             {

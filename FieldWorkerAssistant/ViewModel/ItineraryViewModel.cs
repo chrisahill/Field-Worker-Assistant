@@ -220,9 +220,43 @@ namespace FieldWorkerAssistant.ViewModel
             foreach (var source in cache.FeatureTables)
             {
                 App app = (App)App.Current;
-                CachedFeatureLayer = new ArcGISFeatureLayer(source) { ID = source.Name , Renderer = app.WorkItemsRenderer};
+                CachedFeatureLayer = new ArcGISFeatureLayer(source) { ID = source.Name }; 
+                    // , Renderer = app.WorkItemsRenderer}; KNOWN ISSUE where overriding renderer doesn't work
                 QueryFilter filter = new QueryFilter() { WhereClause = "1=1" };
                 var gdbFeatures = await CachedFeatureLayer.FeatureTable.QueryAsync(filter);
+
+                foreach (var feature in gdbFeatures)
+                {
+                    if (feature is GdbFeature)
+                    {
+                    }
+                }
+
+                Esri.ArcGISRuntime.Symbology.SimpleMarkerSymbol sms = new Esri.ArcGISRuntime.Symbology.SimpleMarkerSymbol()
+                {
+                    Color = Windows.UI.Colors.Red,
+                    Size = 24
+                };
+                Esri.ArcGISRuntime.Symbology.SimpleRenderer renderer = new Esri.ArcGISRuntime.Symbology.SimpleRenderer()
+                {
+                    Symbol = sms
+                };
+                // HACK to work around issue where renderer doesn't work on ArcGISFeatureLayer
+                var gLayer = new GraphicsLayer()
+                {
+                    Renderer = app.WorkItemsRenderer
+                };
+                foreach (GdbFeature feature in gdbFeatures)
+                {
+                    Graphic g = feature.AsGraphic();
+                    // HACK to work around issue with GdbFeature.AsGraphic
+                    g.Attributes.Remove("GlobalID");
+                    gLayer.Graphics.Add(g);
+                }
+
+                // This WOULD work were it not for issue with GlobalID in graphic
+                //gLayer.Graphics.AddRange(gdbFeatures.Select(f => ((GdbFeature)f).AsGraphic()));
+                app.RouteViewModel.CachedGraphicsLayer = gLayer;
                 
                 app.RouteViewModel.CachedFeatureLayer = CachedFeatureLayer;
                 app.RouteViewModel.GdbFile = file;

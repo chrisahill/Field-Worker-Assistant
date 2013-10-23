@@ -20,7 +20,19 @@ namespace FieldWorkerAssistant.Converters
             {
                 var serviceItems = (IEnumerable<ServiceItemViewModel>)value;
                 foreach (var item in serviceItems)
-                    features.Add((Graphic)item.Service.Feature);
+                {
+                    if (item.Service.Feature is Graphic)
+                    {
+                        features.Add((Graphic)item.Service.Feature);
+                    }
+                    else if (item.Service.Feature is GdbFeature)
+                    {
+                        var g = ((GdbFeature)item.Service.Feature).AsGraphic();
+                        if (g.Attributes.ContainsKey("GlobalID"))
+                            g.Attributes.Remove("GlobalID");
+                        features.Add(g);
+                    }
+                }
             }
             return features;
         }

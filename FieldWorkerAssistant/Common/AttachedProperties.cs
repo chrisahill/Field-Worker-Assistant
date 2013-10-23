@@ -60,20 +60,36 @@ namespace FieldWorkerAssistant.Common
 
             if (e.NewItems != null)
             {
-                foreach (var item in e.NewItems)
+                if (listBox.SelectionMode == SelectionMode.Extended ||
+                    listBox.SelectionMode == SelectionMode.Multiple)
                 {
-                    if (!listBox.SelectedItems.Contains(item))
-                        listBox.SelectedItems.Add(item);
+                    foreach (var item in e.NewItems)
+                    {
+                        if (!listBox.SelectedItems.Contains(item))
+                            listBox.SelectedItems.Add(item);
+                    }
+                }
+                else
+                {
+                    listBox.SelectedItem = e.NewItems[0];
                 }
             }
 
             if (e.OldItems != null)
             {
-                foreach (var item in e.OldItems)
+                if (listBox.SelectionMode == SelectionMode.Extended ||
+                    listBox.SelectionMode == SelectionMode.Multiple)
                 {
-                    if (listBox.SelectedItems.Contains(item))
-                        listBox.SelectedItems.Remove(item);
+                    foreach (var item in e.OldItems)
+                    {
+                        if (listBox.SelectedItems.Contains(item))
+                            listBox.SelectedItems.Remove(item);
+                    }
                 }
+                //else if (e.NewItems == null)
+                //{
+                //    listBox.SelectedItem = null;
+                //}
             }
         }
 

@@ -26,9 +26,17 @@ namespace FieldWorkerAssistant
         public RouteViewModel()
         {
             RouteServiceItems = new ObservableCollection<ServiceItemViewModel>();
+            SelectedRouteServiceItems = new ObservableCollection<ServiceItemViewModel>();
+            SelectedRouteServiceItems.CollectionChanged += SelectedRouteServiceItems_CollectionChanged;
             SolveRouteCommand = new DelegateCommand(executeSolveRoute, canExecuteSolveRoute);
         }
+
+        void SelectedRouteServiceItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged("SelectedRouteServiceItems");
+        }
         public ObservableCollection<ServiceItemViewModel> RouteServiceItems { get; internal set; }
+        public ObservableCollection<ServiceItemViewModel> SelectedRouteServiceItems { get; internal set; }
 
         private ArcGISFeatureLayer m_CachedFeatureLayer;
         public ArcGISFeatureLayer CachedFeatureLayer
@@ -47,6 +55,12 @@ namespace FieldWorkerAssistant
                 }
             }
         }
+
+        /// <summary>
+        /// Provides access to the cached feature layer as a graphics layer
+        /// </summary>
+        public GraphicsLayer CachedGraphicsLayer { get; internal set; }
+
         public void InitializeServiceItems(IEnumerable<Feature> features)
         {
             ServiceItemViewModel[] allItemsCopy = RouteServiceItems.ToArray();
