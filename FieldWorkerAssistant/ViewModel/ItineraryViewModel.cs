@@ -1,6 +1,7 @@
 ﻿using Esri.ArcGISRuntime.Data;
 using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Layers;
+using Esri.ArcGISRuntime.Tasks.Offline;
 using FieldWorkerAssistant.Model;
 using FieldWorkerAssitant.Common;
 using System;
@@ -9,10 +10,14 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Windows.Storage;
+using System.IO;
+using System.Threading;
 
 namespace FieldWorkerAssistant.ViewModel
 {
@@ -55,6 +60,7 @@ namespace FieldWorkerAssistant.ViewModel
 
             IncludeAllCommand = new DelegateCommand(includeAll, canIncludeAll);
             ExcludeAllCommand = new DelegateCommand(excludeAll, canExcludeAll);
+            DownloadCommand = new DelegateCommand(download, canDownload);
         }
 
         void AllServiceItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -98,6 +104,8 @@ namespace FieldWorkerAssistant.ViewModel
 
         public ICommand ExcludeAllCommand { get; private set; }
 
+        public ICommand DownloadCommand { get; private set; }
+
         public void InitializeServiceItems(IEnumerable<Feature> features)
         {
             if (ExcludeAllCommand.CanExecute(null))
@@ -140,11 +148,86 @@ namespace FieldWorkerAssistant.ViewModel
             foreach (var item in includedItemsCopy)
                 IncludedServiceItems.Remove(item);
         }
+        
+        private const string FeatureServiceUri = "http://services.arcgis.com/pmcEyn9tLWCoX7Dm/arcgis/rest/services/HackathonSR/FeatureServer";
+        private Envelope MapExtent = new Envelope(-13046907.1247363, 4034314.00501996, -13042604.5495666, 4038309.25339177,
+                new SpatialReference(3857));
+
+        private bool canDownload(object parameter)
+        {
+            return IncludedServiceItems.Count > 0;
+        }
+
+        private async void download(object parameter)
+        {
+            StorageFile file = null;
+            try
+            {
+                file = await ApplicationData.Current.LocalFolder.GetFileAsync("Replica.geodatabase");
+            }
+            catch
+            {
+            }
+            if (file == null)
+            {
+                var task = new GeodatabaseTask(new Uri(FeatureServiceUri));
+                var jobresult = await task.SubmitGenerateGeodatabaseJobAsync(
+                 new GenerateGeodatabaseParameters(new int[] { 0 }, MapExtent) { SyncModel = SyncModel.PerLayer },
+                 async (status, error) => //complete callback
+                 {
+                     HttpClient client = new HttpClient();
+                     var result = await client.GetStreamAsync(status.ResultUri);
+                     file = await ApplicationData.Current.LocalFolder.CreateFileAsync("Replica.geodatabase", CreationCollisionOption.OpenIfExists);
+                     using (var stream = await file.OpenStreamForWriteAsync())
+                     {
+                         result.CopyTo(stream);
+                     }
+                     await CreateCachedFeatureLayer(file);
+                 }, TimeSpan.FromSeconds(2), CancellationToken.None,
+                 (status) => //status updates
+                 {
+                     
+                 });
+            }
+            else
+            {
+                await CreateCachedFeatureLayer(file);
+            }
+        }
+
+        private async Task CreateCachedFeatureLayer(StorageFile file)
+        {
+            var geodatabasePath = file.Path;
+            var cache = await Geodatabase.OpenAsync(geodatabasePath);
+            foreach (var source in cache.FeatureTables)
+            {
+                CachedFeatureLayer = new ArcGISFeatureLayer(source) { ID = source.Name };                    
+                break;
+            }
+        }
+
+        private ArcGISFeatureLayer m_CachedFeatureLayer;
+        public ArcGISFeatureLayer CachedFeatureLayer
+        {
+            get
+            {
+                return m_CachedFeatureLayer;
+            }
+            private set
+            {
+                if (m_CachedFeatureLayer != value)
+                {
+                    m_CachedFeatureLayer = value;                    
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         private void raiseCanExecuteChanged()
         {
             ((DelegateCommand)IncludeAllCommand).RaiseCanExecuteChanged();
             ((DelegateCommand)ExcludeAllCommand).RaiseCanExecuteChanged();
+            ((DelegateCommand)DownloadCommand).RaiseCanExecuteChanged();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

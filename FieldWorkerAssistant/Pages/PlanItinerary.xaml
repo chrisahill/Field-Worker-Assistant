@@ -253,6 +253,7 @@
                     Command="{Binding ExcludeAllCommand}" />
                 <Button Content="Download"
                         Grid.Column="2"
+                        Command="{Binding DownloadCommand}"
                         HorizontalAlignment="Right"/>
             </Grid>
         </AppBar>
