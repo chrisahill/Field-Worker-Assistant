@@ -98,7 +98,7 @@ namespace FieldWorkerAssistant
 
             WorkItemsRenderer = uvRenderer;
         }
-
+        internal string FeatureServiceUri = "http://services.arcgis.com/pmcEyn9tLWCoX7Dm/arcgis/rest/services/HackathonSR/FeatureServer";
         internal ItineraryViewModel ItineraryViewModel { get; private set; }
         internal RouteViewModel RouteViewModel { get; private set; }
         internal GdbFeature SelectedFeature { get; set; }        
