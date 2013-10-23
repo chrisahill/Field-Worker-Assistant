@@ -48,6 +48,43 @@ namespace FieldWorkerAssistant
             }
         }
 
+        private GraphicsLayer m_GPSLayer;
+        public GraphicsLayer GPSLayer
+        {
+            get
+            {
+                return m_GPSLayer;
+            }
+            internal set
+            {
+                if (m_GPSLayer != value)
+                {
+                    m_GPSLayer = value;                    
+
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private GraphicsLayer m_RouteLayer;
+        public GraphicsLayer RouteLayer
+        {
+            get
+            {
+                return m_RouteLayer;
+            }
+            internal set
+            {
+                if (m_RouteLayer != value)
+                {
+                    m_RouteLayer = value;
+
+                    OnPropertyChanged();
+                }
+            }
+        }
+        
+
         private bool m_HasChanges;
 
         public bool HasChanges
