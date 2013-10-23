@@ -1,4 +1,5 @@
 ﻿using Esri.ArcGISRuntime.Data;
+using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Symbology;
 using FieldWorkerAssistant.Common;
 using FieldWorkerAssistant.ViewModel;
@@ -40,6 +41,10 @@ namespace FieldWorkerAssistant
 
             ItineraryViewModel = new ItineraryViewModel();
             RouteViewModel = new RouteViewModel();
+
+            DefaultExtent = new Envelope(-13046530.4359927, 4034612.33785403, 
+                -13042227.860823, 4038825.27604103, SpatialReferences.WebMercator);
+
             SimpleLineSymbol outline = new SimpleLineSymbol()
             {
                 Color = Colors.Black,
@@ -103,6 +108,7 @@ namespace FieldWorkerAssistant
         internal RouteViewModel RouteViewModel { get; private set; }
         internal GdbFeature SelectedFeature { get; set; }        
         internal Renderer WorkItemsRenderer { get; private set; }
+        internal Envelope DefaultExtent { get; private set; }
 
         // Stores whether the user has logged in to the app
         internal bool LoggedIn { get; set; }

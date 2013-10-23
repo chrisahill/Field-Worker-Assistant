@@ -32,6 +32,8 @@ namespace FieldWorkerAssistant
         public RouteViewModel()
         {
             RouteServiceItems = new ObservableCollection<ServiceItemViewModel>();
+            SelectedRouteServiceItems = new ObservableCollection<ServiceItemViewModel>();
+            SelectedRouteServiceItems.CollectionChanged += SelectedRouteServiceItems_CollectionChanged;
             //SolveRouteCommand = new DelegateCommand(executeSolveRoute, canExecuteSolveRoute);                          
             SyncCommand = new DelegateCommand(syncCommand, canSyncCommand);
             var v = InitRouteService();
@@ -49,7 +51,13 @@ namespace FieldWorkerAssistant
             routeParams.ReturnDirections = false;
             routeParams.ReturnStops = false;
         }
+
+        void SelectedRouteServiceItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged("SelectedRouteServiceItems");
+        }
         public ObservableCollection<ServiceItemViewModel> RouteServiceItems { get; internal set; }
+        public ObservableCollection<ServiceItemViewModel> SelectedRouteServiceItems { get; internal set; }
 
         private ArcGISFeatureLayer m_CachedFeatureLayer;
         public ArcGISFeatureLayer CachedFeatureLayer
@@ -63,11 +71,16 @@ namespace FieldWorkerAssistant
                 if (m_CachedFeatureLayer != value)
                 {
                     m_CachedFeatureLayer = value;
-
+                    raiseCanExecuteChanged();
                     OnPropertyChanged();
                 }
             }
         }
+
+        /// <summary>
+        /// Provides access to the cached feature layer as a graphics layer
+        /// </summary>
+        public GraphicsLayer CachedGraphicsLayer { get; internal set; }
         
         private GraphicsLayer m_RouteLayer;
         public GraphicsLayer RouteLayer
@@ -80,9 +93,9 @@ namespace FieldWorkerAssistant
                     {
                         Symbol = new SimpleLineSymbol
                         {
-                            Color = Colors.DodgerBlue,
+                            Color = Colors.DarkBlue,
                             Style = SimpleLineStyle.Solid,
-                            Width = 2
+                            Width = 5
                         }
                     }
                 });
@@ -107,8 +120,11 @@ namespace FieldWorkerAssistant
             internal set
             {
                 if (m_HasChanges != value)
+                {
                     m_HasChanges = value;
-                OnPropertyChanged();
+                    OnPropertyChanged();
+                    raiseCanExecuteChanged();
+                }
             }
         }
 
@@ -136,15 +152,15 @@ namespace FieldWorkerAssistant
         public ICommand GeocodeCommand { get; private set; }
         public ICommand ReverseGeocodeCommand { get; private set; }
         public ICommand SyncCommand { get; private set; }
-        public bool HasEdit { get; internal set; }
         private bool canSyncCommand(object parameter)
         {
-            return CachedFeatureLayer != null && CachedFeatureLayer.FeatureTable != null && GdbFile != null && HasEdit;
+            return CachedFeatureLayer != null && CachedFeatureLayer.FeatureTable != null && GdbFile != null && HasChanges;
         }
         private async void syncCommand(object parameter)
         {
             if (!canSyncCommand(parameter))
                 return;
+            IsSynching = true;
             string serviceTaskUri = ((App)App.Current).FeatureServiceUri;
             var task = new GeodatabaseTask(new Uri(serviceTaskUri));
             SyncGeodatabaseParameters parameters = new SyncGeodatabaseParameters()
@@ -183,8 +199,8 @@ namespace FieldWorkerAssistant
 
         private void raiseCanExecuteChanged()
         {
-            ((DelegateCommand)GeocodeCommand).RaiseCanExecuteChanged();
-            ((DelegateCommand)ReverseGeocodeCommand).RaiseCanExecuteChanged();
+            //((DelegateCommand)GeocodeCommand).RaiseCanExecuteChanged();
+            //((DelegateCommand)ReverseGeocodeCommand).RaiseCanExecuteChanged();
             ((DelegateCommand)SyncCommand).RaiseCanExecuteChanged();
         }
 
@@ -192,7 +208,18 @@ namespace FieldWorkerAssistant
         /// <summary>
         /// Gets the file underlying the <see cref="CachedFeatureLayer"/>
         /// </summary>
-        public StorageFile GdbFile { get; internal set; }
+        private StorageFile m_GdbFile;
+        public StorageFile GdbFile { get { return m_GdbFile; }
+            internal set
+            {
+                if (m_GdbFile != value)
+                {
+                    m_GdbFile = value;
+                    OnPropertyChanged();
+                    raiseCanExecuteChanged();
+                }
+            }
+        }
 
         private bool canExecuteSolveRoute(object parameter)
         {
@@ -202,6 +229,7 @@ namespace FieldWorkerAssistant
         internal async void executeSolveRoute(IEnumerable<Graphic> stops)
         {
             Graphic graphicRoute = await SolveRouteOffline(stops);
+            graphicRoute.Geometry = GeometryEngine.Project(graphicRoute.Geometry, SpatialReferences.WebMercator);
             RouteLayer.Graphics.Clear();
             RouteLayer.Graphics.Add(graphicRoute);            
         }

@@ -16,6 +16,8 @@ using Windows.UI.Xaml.Navigation;
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 using Esri.ArcGISRuntime.Location;
 using FieldWorkerAssistant.Common;
+using FieldWorkerAssistant.Converters;
+using Esri.ArcGISRuntime.Data;
 using FieldWorkerAssistant.ViewModel;
 
 namespace FieldWorkerAssistant.Pages
@@ -41,24 +43,84 @@ namespace FieldWorkerAssistant.Pages
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            var viewModel = ((App)App.Current).RouteViewModel;
-            if (MyMap.Layers.Contains(viewModel.CachedFeatureLayer))
-                MyMap.Layers.Remove(viewModel.CachedFeatureLayer);
+            //var viewModel = ((App)App.Current).RouteViewModel;
+            //if (MyMap.Layers.Contains(viewModel.CachedGraphicsLayer))
+            //    MyMap.Layers.Remove(viewModel.CachedGraphicsLayer);
+            //if (MyMap.Layers.Contains(viewModel.CachedFeatureLayer))
+            //    MyMap.Layers.Remove(viewModel.CachedFeatureLayer);
             
-            if (MyMap.Layers.Contains(viewModel.RouteLayer))
-                MyMap.Layers.Remove(viewModel.RouteLayer);
+            //if (MyMap.Layers.Contains(viewModel.RouteLayer))
+            //    MyMap.Layers.Remove(viewModel.RouteLayer);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            var viewModel = ((App)App.Current).RouteViewModel;
-            if (!MyMap.Layers.Contains(viewModel.CachedFeatureLayer))
-                MyMap.Layers.Add(viewModel.CachedFeatureLayer);
-            
+            var app = ((App)App.Current);
+            var viewModel = app.RouteViewModel;
+            MyMap.InitialExtent = app.DefaultExtent;
+            if (!MyMap.Layers.Contains(viewModel.CachedGraphicsLayer))
+            {
+                MyMap.Layers.Insert(1, viewModel.CachedGraphicsLayer);
+                viewModel.CachedGraphicsLayer.Tapped += ServiceItemsLayer_Tapped;
+            }
+
             if (!MyMap.Layers.Contains(viewModel.RouteLayer))
                 MyMap.Layers.Add(viewModel.RouteLayer);
-        
+
+            // Bind selected items layer's graphics source to included items collection - need to do it in 
+            // code behind because it can't be done in XAML
+            GraphicsLayer includedItemsLayer = (GraphicsLayer)MyMap.Layers["SelectedItemsLayer"];
+            Binding b = new Binding()
+            {
+                Path = new PropertyPath("SelectedRouteServiceItems"),
+                Source = viewModel,
+                Converter = new ServiceItemsToFeatures()
+            };
+            BindingOperations.SetBinding(includedItemsLayer, GraphicsLayer.GraphicsSourceProperty, b);
+        }
+
+        async void ServiceItemsLayer_Tapped(object sender, GraphicTappedRoutedEventArgs e)
+        {
+            toggleSelectGraphic(e.Graphic);
+
+            var app = ((App)Application.Current);
+            var viewModel = app.RouteViewModel;
+            QueryFilter filter = new QueryFilter()
+            {
+                WhereClause = string.Format("OBJECTID = {0}", e.Graphic.Attributes["OBJECTID"])
+            };
+            var result = await viewModel.CachedFeatureLayer.FeatureTable.QueryAsync(filter);
+            if (result.Count() > 0)
+                app.SelectedFeature = (GdbFeature)result.ElementAt(0);
+        }
+
+        private void toggleSelectGraphic(Graphic g)
+        {
+            var viewModel = ((App)Application.Current).RouteViewModel;
+            foreach (var item in viewModel.RouteServiceItems)
+            {
+                object id1 = item.Service.Feature.Attributes["OBJECTID"];
+                object id2 = g.Attributes["OBJECTID"];
+                bool b = id1 == id2;
+            }
+            if (viewModel.SelectedRouteServiceItems.Any(
+                item => (int)item.Service.Feature.Attributes["OBJECTID"] == (int)g.Attributes["OBJECTID"]))
+            {
+                var selectedItem = viewModel.SelectedRouteServiceItems.First(item =>
+                    (int)item.Service.Feature.Attributes["OBJECTID"] == (int)g.Attributes["OBJECTID"]);
+                viewModel.SelectedRouteServiceItems.Remove(selectedItem);
+            }
+            else if (viewModel.RouteServiceItems.Any(
+                item => (int)item.Service.Feature.Attributes["OBJECTID"] == (int)g.Attributes["OBJECTID"]))
+            {
+                var itemsCopy = viewModel.SelectedRouteServiceItems.ToArray();
+                foreach (var item in itemsCopy)
+                    viewModel.SelectedRouteServiceItems.Remove(item);
+                var newItem = viewModel.RouteServiceItems.First(
+                    item => (int)item.Service.Feature.Attributes["OBJECTID"] == (int)g.Attributes["OBJECTID"]);
+                viewModel.SelectedRouteServiceItems.Add(newItem);
+            }
         }
 
         /// <summary>
@@ -109,9 +171,12 @@ namespace FieldWorkerAssistant.Pages
         {
             var item = (ServiceItemViewModel) e.AddedItems[0];            
             var startPoint = new Graphic {Geometry = MyMap.LocationDisplay.CurrentLocation.Location};
-            var endPoint = new Graphic {Geometry = item.Service.Feature.Geometry};        
-           
-            ((App)App.Current).RouteViewModel.executeSolveRoute(new[] {startPoint,endPoint});
+            var endPoint = new Graphic {Geometry = item.Service.Feature.Geometry};
+
+            var app = ((App)App.Current);
+            app.RouteViewModel.executeSolveRoute(new[] {startPoint,endPoint});
+
+            app.SelectedFeature = (GdbFeature)item.Service.Feature;
         }
     }
 }

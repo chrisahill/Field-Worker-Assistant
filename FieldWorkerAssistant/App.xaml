@@ -17,6 +17,12 @@
             <SolidColorBrush x:Key="ListBoxItemSelectedBackgroundThemeBrush" Color="#33FFFFFF" />
             <SolidColorBrush x:Key="ListBoxItemPointerOverBackgroundThemeBrush" Color="#16FFFFFF" />
             <SolidColorBrush x:Key="ListBoxItemSelectedPointerOverBackgroundThemeBrush" Color="#05FFFFFF" />
+
+            <SolidColorBrush x:Key="ListViewItemSelectedBackgroundThemeBrush" Color="#33FFFFFF" />
+            <SolidColorBrush x:Key="ListViewItemPointerOverBackgroundThemeBrush" Color="#16FFFFFF" />
+            <SolidColorBrush x:Key="ListViewItemSelectedPointerOverBackgroundThemeBrush" Color="#05FFFFFF" />
+            <SolidColorBrush x:Key="ListViewItemSelectedPointerOverBorderThemeBrush" Color="#33FFFFFF" />
+
             <Style x:Key="ItineraryItemsListBoxStyle"
                    TargetType="ListBox">
                 <Setter Property="Foreground"

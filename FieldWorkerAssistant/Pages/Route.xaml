@@ -10,8 +10,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Esri.ArcGISRuntime.Controls"
-    xmlns:layers="using:Esri.ArcGISRuntime.Layers"
+    xmlns:esriLayers="using:Esri.ArcGISRuntime.Layers"
     xmlns:data="using:Esri.ArcGISRuntime.Data"
+    xmlns:esriSymbols="using:Esri.ArcGISRuntime.Symbology"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -57,9 +58,10 @@
                     <!--Offline service issues -->
                     <ListBox ItemsSource="{Binding RouteServiceItems}"
                              Background="Transparent"
+                             SelectionMode="Single"
                              Style="{StaticResource ItineraryItemsListBoxStyle}"
-                             SelectionChanged="Selector_OnSelectionChanged"
-                             SelectionMode="Single">
+                             common:AttachedProperties.SelectedItemsSource="{Binding SelectedRouteServiceItems}"
+                             SelectionChanged="Selector_OnSelectionChanged">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -104,8 +106,25 @@
                 </Grid>
                 <Grid Grid.Row="1"
                       Grid.Column="1">
-                    <controls:Map x:Name="MyMap" Tapped="MyMap_Tapped" >
-                        <layers:ArcGISLocalTiledLayer Path="ms-appx:///Data/RedlandsBasemap.tpk" />
+                    <controls:Map x:Name="MyMap">
+                        <!--Layers-->
+                        <esriLayers:ArcGISLocalTiledLayer Path="ms-appx:///Data/RedlandsBasemap.tpk" />
+                        <esriLayers:GraphicsLayer 
+                            ID="SelectedItemsLayer">
+                            <esriLayers:GraphicsLayer.Renderer>
+                                <esriSymbols:SimpleRenderer>
+                                    <esriSymbols:SimpleRenderer.Symbol>
+                                        <esriSymbols:SimpleMarkerSymbol Color ="Cyan"
+                                                            Size="28">
+                                            <esriSymbols:SimpleMarkerSymbol.Outline>
+                                                <esriSymbols:SimpleLineSymbol Color="Black"
+                                                                  Width="2" />
+                                            </esriSymbols:SimpleMarkerSymbol.Outline>
+                                        </esriSymbols:SimpleMarkerSymbol>
+                                    </esriSymbols:SimpleRenderer.Symbol>
+                                </esriSymbols:SimpleRenderer>
+                            </esriLayers:GraphicsLayer.Renderer>
+                        </esriLayers:GraphicsLayer>
                     </controls:Map>
                 </Grid>
                 <Grid>
@@ -148,7 +167,7 @@
         <AppBar IsSticky="True" IsOpen="True" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" BorderBrush="Transparent">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="Worksheet" Click="Worksheet_Click" />
-                <Button Content="Sync" />
+                <Button Content="Sync" Command="{Binding SyncCommand}"/>
             </StackPanel>
         </AppBar>
     </common:LayoutAwarePage.BottomAppBar>
