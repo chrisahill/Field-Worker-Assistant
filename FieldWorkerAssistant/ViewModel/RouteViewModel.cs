@@ -1,6 +1,9 @@
-﻿using Esri.ArcGISRuntime.Data;
+﻿using System.Linq.Expressions;
+using Windows.UI;
+using Esri.ArcGISRuntime.Data;
 using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Layers;
+using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.Tasks.Geocoding;
 using Esri.ArcGISRuntime.Tasks.NetworkAnalyst;
 using FieldWorkerAssistant.Model;
@@ -26,7 +29,7 @@ namespace FieldWorkerAssistant
         public RouteViewModel()
         {
             RouteServiceItems = new ObservableCollection<ServiceItemViewModel>();
-            SolveRouteCommand = new DelegateCommand(executeSolveRoute, canExecuteSolveRoute);
+            //SolveRouteCommand = new DelegateCommand(executeSolveRoute, canExecuteSolveRoute);            
         }
         public ObservableCollection<ServiceItemViewModel> RouteServiceItems { get; internal set; }
 
@@ -47,31 +50,24 @@ namespace FieldWorkerAssistant
                 }
             }
         }
-
-        private GraphicsLayer m_GPSLayer;
-        public GraphicsLayer GPSLayer
-        {
-            get
-            {
-                return m_GPSLayer;
-            }
-            internal set
-            {
-                if (m_GPSLayer != value)
-                {
-                    m_GPSLayer = value;                    
-
-                    OnPropertyChanged();
-                }
-            }
-        }
-
+        
         private GraphicsLayer m_RouteLayer;
         public GraphicsLayer RouteLayer
         {
             get
             {
-                return m_RouteLayer;
+                return m_RouteLayer ?? (m_RouteLayer = new GraphicsLayer 
+                { ID = "RouteLayer", 
+                    Renderer = new SimpleRenderer
+                    {
+                        Symbol = new SimpleLineSymbol
+                        {
+                            Color = Colors.DodgerBlue,
+                            Style = SimpleLineStyle.Solid,
+                            Width = 2
+                        }
+                    }
+                });
             }
             internal set
             {
@@ -132,11 +128,11 @@ namespace FieldWorkerAssistant
             return true;
         }
 
-        private async void executeSolveRoute(object parameter)
+        internal async void executeSolveRoute(IEnumerable<Graphic> stops)
         {
-            Graphic graphicRoute = await SolveRouteOffline();
-            if (graphicRoute != null)
-                await AddGraphicLayer(new List<Graphic>() { graphicRoute });
+            Graphic graphicRoute = await SolveRouteOffline(stops);
+            RouteLayer.Graphics.Clear();
+            RouteLayer.Graphics.Add(graphicRoute);            
         }
 
         private bool canExecuteGeocode(object parameter)
@@ -207,7 +203,7 @@ namespace FieldWorkerAssistant
             return locFile.Path;
         }
 
-        private async Task<Graphic> SolveRouteOffline()
+        private async Task<Graphic> SolveRouteOffline(IEnumerable<Graphic> stops)
         {
             try
             {
@@ -218,7 +214,7 @@ namespace FieldWorkerAssistant
                 routeParams.ReturnRoutes = true;
                 routeParams.ReturnDirections = true;
                 routeParams.ReturnStops = true;
-                routeParams.Stops = new FeaturesAsFeature(GetStops());
+                routeParams.Stops = new FeaturesAsFeature(stops);
                 RouteResult result = await lrt.SolveAsync(routeParams);
                 if (result != null && result.Routes != null)
                 {

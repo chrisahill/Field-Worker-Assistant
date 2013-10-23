@@ -58,6 +58,7 @@
                     <ListBox ItemsSource="{Binding RouteServiceItems}"
                              Background="Transparent"
                              Style="{StaticResource ItineraryItemsListBoxStyle}"
+                             SelectionChanged="Selector_OnSelectionChanged"
                              SelectionMode="Single">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
@@ -103,8 +104,7 @@
                 </Grid>
                 <Grid Grid.Row="1"
                       Grid.Column="1">
-                    <controls:Map x:Name="MyMap" Tapped="MyMap_Tapped">
-                        <!--Layers-->
+                    <controls:Map x:Name="MyMap" Tapped="MyMap_Tapped" >
                         <layers:ArcGISLocalTiledLayer Path="ms-appx:///Data/RedlandsBasemap.tpk" />
                     </controls:Map>
                 </Grid>
