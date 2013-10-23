@@ -25,6 +25,9 @@ namespace FieldWorkerAssistant.Pages
 
             pageDate.Text = DateTime.Now.ToString("M");
             pageTime.Text = DateTime.Now.ToString("h:mm tt");
+            StartTimeTextBlock.Text = DateTime.Now.ToString("h:mm tt");
+            EndTimeTextBlock.Text = DateTime.Now.AddHours(1).ToString("h:mm tt");
+
 
             var clock = new DispatcherTimer {Interval = new TimeSpan(0,0,1,0,0)};
             clock.Tick += (s, e) => { pageTime.Text = DateTime.Now.ToString("h:mm tt"); };
