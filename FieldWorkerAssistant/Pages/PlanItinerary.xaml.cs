@@ -63,6 +63,26 @@ namespace FieldWorkerAssistant.Pages
             }
         }
 
+        void WorkItemsLayer_Tapped(object sender, GraphicTappedRoutedEventArgs e)
+        {
+            toggleSelectGraphic(e.Graphic);
+        }
+
+        private void toggleSelectGraphic(Graphic g)
+        {
+            var viewModel = ((App)Application.Current).ItineraryViewModel;
+            if (viewModel.IncludedServiceItems.Any(item => item.Service.Feature == g))
+            {
+                var selectedItem = viewModel.IncludedServiceItems.First(item => item.Service.Feature == g);
+                viewModel.IncludedServiceItems.Remove(selectedItem);
+            }
+            else if (viewModel.AllServiceItems.Any(item => item.Service.Feature == g))
+            {
+                var newItem = viewModel.AllServiceItems.First(item => item.Service.Feature == g);
+                viewModel.IncludedServiceItems.Add(newItem);
+            }
+        }
+
         /// <summary>
         /// Populates the page with content passed during navigation.  Any saved state is also
         /// provided when recreating a page from a prior session.
@@ -93,6 +113,11 @@ namespace FieldWorkerAssistant.Pages
 
             foreach (ServiceItemViewModel item in e.RemovedItems)
                 item.Included = false;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(Route));
         }
     }
 }
