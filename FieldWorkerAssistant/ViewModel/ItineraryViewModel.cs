@@ -169,7 +169,7 @@ namespace FieldWorkerAssistant.ViewModel
                 IncludedServiceItems.Remove(item);
         }
         
-        private const string FeatureServiceUri = "http://services.arcgis.com/pmcEyn9tLWCoX7Dm/arcgis/rest/services/HackathonSR/FeatureServer";
+        
         private Envelope MapExtent = new Envelope(-13046907.1247363, 4034314.00501996, -13042604.5495666, 4038309.25339177,
                 new SpatialReference(3857));
 
@@ -182,7 +182,8 @@ namespace FieldWorkerAssistant.ViewModel
         {
             IsDownloading = true;
 
-            var task = new GeodatabaseTask(new Uri(FeatureServiceUri));
+            string serviceTaskUri = ((App)App.Current).FeatureServiceUri;
+            var task = new GeodatabaseTask(new Uri(serviceTaskUri));
             var layerQueries = new Dictionary<int, LayerQuery>();
             var ids = from item in IncludedServiceItems select (long)item.Service.OBJECTID;
             layerQueries[0] = new LayerQuery() { Where = string.Format("OBJECTID IN ({0})", string.Join(",", ids)) };

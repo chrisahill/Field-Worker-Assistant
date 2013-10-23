@@ -1,8 +1,13 @@
-﻿using Esri.ArcGISRuntime.Data;
+﻿using System.Linq.Expressions;
+using Windows.UI;
+using Esri.ArcGISRuntime.Data;
 using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Layers;
+using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.Tasks.Geocoding;
 using Esri.ArcGISRuntime.Tasks.NetworkAnalyst;
+using Esri.ArcGISRuntime.Tasks.Offline;
+using Esri.ArcGISRuntime.WebMap;
 using FieldWorkerAssistant.Model;
 using FieldWorkerAssistant.ViewModel;
 using FieldWorkerAssitant.Common;
@@ -17,18 +22,38 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Storage;
+using Windows.UI.Xaml;
 
 namespace FieldWorkerAssistant
 {
     internal class RouteViewModel : INotifyPropertyChanged
     {
-
+        private LocalRouteTask _routeTask = null;
         public RouteViewModel()
         {
             RouteServiceItems = new ObservableCollection<ServiceItemViewModel>();
+<<<<<<< HEAD
             SelectedRouteServiceItems = new ObservableCollection<ServiceItemViewModel>();
             SelectedRouteServiceItems.CollectionChanged += SelectedRouteServiceItems_CollectionChanged;
             SolveRouteCommand = new DelegateCommand(executeSolveRoute, canExecuteSolveRoute);
+=======
+            //SolveRouteCommand = new DelegateCommand(executeSolveRoute, canExecuteSolveRoute);                          
+            SyncCommand = new DelegateCommand(syncCommand, canSyncCommand);
+            var v = InitRouteService();
+            Task.WaitAll(new[] {v});
+        }
+
+        public async Task InitRouteService()
+        {
+            //Initialize network            
+            var appResourceUri = new Uri("ms-appx:///Data/Network/CaliforniaNevada/RuntimeCANV.geodatabase");                     
+            var databasePath = await StorageFile.GetFileFromApplicationUriAsync(appResourceUri);
+            _routeTask = new LocalRouteTask(databasePath.Path, "RuntimeCANV");
+            routeParams = await _routeTask.GetDefaultParametersAsync();
+            routeParams.ReturnRoutes = true;
+            routeParams.ReturnDirections = false;
+            routeParams.ReturnStops = false;
+>>>>>>> 4ced8e83619348ce948db4d4aedb18a1f9182e7e
         }
 
         void SelectedRouteServiceItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -55,11 +80,57 @@ namespace FieldWorkerAssistant
                 }
             }
         }
+<<<<<<< HEAD
 
         /// <summary>
         /// Provides access to the cached feature layer as a graphics layer
         /// </summary>
         public GraphicsLayer CachedGraphicsLayer { get; internal set; }
+=======
+        
+        private GraphicsLayer m_RouteLayer;
+        public GraphicsLayer RouteLayer
+        {
+            get
+            {
+                return m_RouteLayer ?? (m_RouteLayer = new GraphicsLayer 
+                { ID = "RouteLayer", 
+                    Renderer = new SimpleRenderer
+                    {
+                        Symbol = new SimpleLineSymbol
+                        {
+                            Color = Colors.DodgerBlue,
+                            Style = SimpleLineStyle.Solid,
+                            Width = 2
+                        }
+                    }
+                });
+            }
+            internal set
+            {
+                if (m_RouteLayer != value)
+                {
+                    m_RouteLayer = value;
+
+                    OnPropertyChanged();
+                }
+            }
+        }
+        
+
+        private bool m_HasChanges;
+
+        public bool HasChanges
+        {
+            get { return m_HasChanges; }
+            internal set
+            {
+                if (m_HasChanges != value)
+                    m_HasChanges = value;
+                OnPropertyChanged();
+            }
+        }
+>>>>>>> 4ced8e83619348ce948db4d4aedb18a1f9182e7e
 
         public void InitializeServiceItems(IEnumerable<Feature> features)
         {
@@ -70,7 +141,7 @@ namespace FieldWorkerAssistant
             foreach (var feature in features)
             {
                 var serviceItem = new ServiceItem(feature);
-                var viewModel = new ServiceItemViewModel(serviceItem);
+                var viewModel = new ServiceItemViewModel(serviceItem);                
                 RouteServiceItems.Add(viewModel);
             }
         }
@@ -84,6 +155,59 @@ namespace FieldWorkerAssistant
         public ICommand SolveRouteCommand { get; private set; }
         public ICommand GeocodeCommand { get; private set; }
         public ICommand ReverseGeocodeCommand { get; private set; }
+        public ICommand SyncCommand { get; private set; }
+        public bool HasEdit { get; internal set; }
+        private bool canSyncCommand(object parameter)
+        {
+            return CachedFeatureLayer != null && CachedFeatureLayer.FeatureTable != null && GdbFile != null && HasEdit;
+        }
+        private async void syncCommand(object parameter)
+        {
+            if (!canSyncCommand(parameter))
+                return;
+            string serviceTaskUri = ((App)App.Current).FeatureServiceUri;
+            var task = new GeodatabaseTask(new Uri(serviceTaskUri));
+            SyncGeodatabaseParameters parameters = new SyncGeodatabaseParameters()
+            {
+                SyncDirection = SyncDirection.Bidirectional
+            };
+            var result = await task.SubmitSyncJobAsync(parameters, GdbFile.Path,
+                (status, err) =>
+                { 
+                    IsSynching = false;
+                },
+                (uploadResult) =>  //delta uploaded
+                {
+                    
+                }, TimeSpan.FromSeconds(2),
+                (status) =>
+                { //status updates
+                },
+                CancellationToken.None);
+        }
+
+        private bool m_IsSynching;
+        public bool IsSynching
+        {
+            get { return m_IsSynching; }
+            private set
+            {
+                if (m_IsSynching != value)
+                {
+                    m_IsSynching = value;
+                    OnPropertyChanged();
+                    raiseCanExecuteChanged();
+                }
+            }
+        }
+
+        private void raiseCanExecuteChanged()
+        {
+            ((DelegateCommand)GeocodeCommand).RaiseCanExecuteChanged();
+            ((DelegateCommand)ReverseGeocodeCommand).RaiseCanExecuteChanged();
+            ((DelegateCommand)SyncCommand).RaiseCanExecuteChanged();
+        }
+
 
         /// <summary>
         /// Gets the file underlying the <see cref="CachedFeatureLayer"/>
@@ -95,11 +219,11 @@ namespace FieldWorkerAssistant
             return true;
         }
 
-        private async void executeSolveRoute(object parameter)
+        internal async void executeSolveRoute(IEnumerable<Graphic> stops)
         {
-            Graphic graphicRoute = await SolveRouteOffline();
-            if (graphicRoute != null)
-                await AddGraphicLayer(new List<Graphic>() { graphicRoute });
+            Graphic graphicRoute = await SolveRouteOffline(stops);
+            RouteLayer.Graphics.Clear();
+            RouteLayer.Graphics.Add(graphicRoute);            
         }
 
         private bool canExecuteGeocode(object parameter)
@@ -170,19 +294,16 @@ namespace FieldWorkerAssistant
             return locFile.Path;
         }
 
-        private async Task<Graphic> SolveRouteOffline()
+        private RouteParameters routeParams;
+        private async Task<Graphic> SolveRouteOffline(IEnumerable<Graphic> stops)
         {
             try
             {
-                Uri appResourceUri = new Uri("ms-appx:///Data/Network/CaliforniaNevada/RuntimeCANV.geodatabase");
-                StorageFile databasePath = await StorageFile.GetFileFromApplicationUriAsync(appResourceUri);
-                LocalRouteTask lrt = new LocalRouteTask(databasePath.Path, "RuntimeCANV");
-                RouteParameters routeParams = await lrt.GetDefaultParametersAsync();
-                routeParams.ReturnRoutes = true;
-                routeParams.ReturnDirections = true;
-                routeParams.ReturnStops = true;
-                routeParams.Stops = new FeaturesAsFeature(GetStops());
-                RouteResult result = await lrt.SolveAsync(routeParams);
+                //Uri appResourceUri = new Uri("ms-appx:///Data/Network/CaliforniaNevada/RuntimeCANV.geodatabase");
+                //StorageFile databasePath = await StorageFile.GetFileFromApplicationUriAsync(appResourceUri);
+                //LocalRouteTask lrt = new LocalRouteTask(databasePath.Path, "RuntimeCANV");                
+                routeParams.Stops = new FeaturesAsFeature(stops);
+                RouteResult result = await _routeTask.SolveAsync(routeParams);
                 if (result != null && result.Routes != null)
                 {
                     return result.Routes[0].RouteGraphic;
@@ -204,7 +325,7 @@ namespace FieldWorkerAssistant
 
             return stops;
         }
-
+        
         private async Task AddGraphicLayer(List<Graphic> graphicList)
         {
             //TODO

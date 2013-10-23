@@ -149,7 +149,18 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <Content Include="Data\Locator\CANV\v101\CaliforniaNevadaLocator.loc" />
+    <Content Include="Data\Locator\CANV\v101\CaliforniaNevadaLocator.locb" />
+    <Content Include="Data\Locator\CANV\v101\CaliforniaNevadaLocator.lox" />
+    <Content Include="Data\Network\CaliforniaNevada\RuntimeCANV.geodatabase" />
+    <Content Include="Data\Network\CaliforniaNevada\RuntimeCANV.tn\Routing_ND_adjacencies" />
+    <Content Include="Data\Network\CaliforniaNevada\RuntimeCANV.tn\Routing_ND_edge_chains" />
+    <Content Include="Data\Network\CaliforniaNevada\RuntimeCANV.tn\Routing_ND_historical_traffic" />
+    <Content Include="Data\Network\CaliforniaNevada\RuntimeCANV.tn\Routing_ND_schema" />
+    <Content Include="Data\Network\CaliforniaNevada\RuntimeCANV.tn\Routing_ND_source_data" />
+    <Content Include="Data\Network\CaliforniaNevada\RuntimeCANV.tn\Routing_ND_weight_values" />
     <None Include="FieldWorkerAssistant_TemporaryKey.pfx" />
+    <Content Include="Data\Locator\CANV\v101\CaliforniaNevadaLocator.loc.xml" />
     <Content Include="Data\RedlandsBasemap.tpk" />
   </ItemGroup>
   <ItemGroup>

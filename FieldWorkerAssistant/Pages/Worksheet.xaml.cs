@@ -55,10 +55,14 @@ namespace FieldWorkerAssistant.Pages
         {
         }      
 
-        private void Save_Click(object sender, RoutedEventArgs e)
+        private async void Save_Click(object sender, RoutedEventArgs e)
         {
             feature.Attributes["Status"] = StatusComboBox.SelectedItem;
             feature.Attributes["ActionTaken"] = ActionTakenTextBox.Text;
+            await ((App) App.Current).RouteViewModel.CachedFeatureLayer.FeatureTable.UpdateAsync(feature);
+            ((App) App.Current).RouteViewModel.HasChanges = true;
+            if(Frame.CanGoBack)
+                Frame.GoBack();            
         }
     }
 }

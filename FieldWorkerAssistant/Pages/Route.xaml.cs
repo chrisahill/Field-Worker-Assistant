@@ -1,4 +1,5 @@
-﻿using Esri.ArcGISRuntime.Layers;
+﻿using Esri.ArcGISRuntime.Geometry;
+using Esri.ArcGISRuntime.Layers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,9 +14,14 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
+using Esri.ArcGISRuntime.Location;
 using FieldWorkerAssistant.Common;
+<<<<<<< HEAD
 using FieldWorkerAssistant.Converters;
 using Esri.ArcGISRuntime.Data;
+=======
+using FieldWorkerAssistant.ViewModel;
+>>>>>>> 4ced8e83619348ce948db4d4aedb18a1f9182e7e
 
 namespace FieldWorkerAssistant.Pages
 {
@@ -29,19 +35,34 @@ namespace FieldWorkerAssistant.Pages
             this.InitializeComponent();
             var viewModel = ((App)App.Current).RouteViewModel;
             this.DataContext = viewModel;
+            MyMap.LocationDisplay.IsEnabled = true;            
+            MyMap.LocationDisplay.CurrentLocation = new LocationInfo()
+            {                
+                Location = new MapPoint(-13046156.2143018, 4036527.88969275) { SpatialReference = new SpatialReference(102100) }
+            };
+            MyMap.LocationDisplay.LocationProvider.StartAsync();
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
             var viewModel = ((App)App.Current).RouteViewModel;
+<<<<<<< HEAD
             if (MyMap.Layers.Contains(viewModel.CachedGraphicsLayer))
                 MyMap.Layers.Remove(viewModel.CachedGraphicsLayer);
+=======
+            if (MyMap.Layers.Contains(viewModel.CachedFeatureLayer))
+                MyMap.Layers.Remove(viewModel.CachedFeatureLayer);
+            
+            if (MyMap.Layers.Contains(viewModel.RouteLayer))
+                MyMap.Layers.Remove(viewModel.RouteLayer);
+>>>>>>> 4ced8e83619348ce948db4d4aedb18a1f9182e7e
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+<<<<<<< HEAD
             var app = ((App)App.Current);
             var viewModel = app.RouteViewModel;
             MyMap.InitialExtent = app.DefaultExtent;
@@ -104,6 +125,15 @@ namespace FieldWorkerAssistant.Pages
                     item => (int)item.Service.Feature.Attributes["OBJECTID"] == (int)g.Attributes["OBJECTID"]);
                 viewModel.SelectedRouteServiceItems.Add(newItem);
             }
+=======
+            var viewModel = ((App)App.Current).RouteViewModel;
+            if (!MyMap.Layers.Contains(viewModel.CachedFeatureLayer))
+                MyMap.Layers.Add(viewModel.CachedFeatureLayer);
+            
+            if (!MyMap.Layers.Contains(viewModel.RouteLayer))
+                MyMap.Layers.Add(viewModel.RouteLayer);
+        
+>>>>>>> 4ced8e83619348ce948db4d4aedb18a1f9182e7e
         }
 
         /// <summary>
@@ -148,6 +178,15 @@ namespace FieldWorkerAssistant.Pages
                 var feature = features.FirstOrDefault();
                 ((App)App.Current).SelectedFeature = feature;
             }
+        }
+
+        private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var item = (ServiceItemViewModel) e.AddedItems[0];            
+            var startPoint = new Graphic {Geometry = MyMap.LocationDisplay.CurrentLocation.Location};
+            var endPoint = new Graphic {Geometry = item.Service.Feature.Geometry};        
+           
+            ((App)App.Current).RouteViewModel.executeSolveRoute(new[] {startPoint,endPoint});
         }
     }
 }

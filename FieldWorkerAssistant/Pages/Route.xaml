@@ -60,7 +60,12 @@
                              Background="Transparent"
                              SelectionMode="Single"
                              Style="{StaticResource ItineraryItemsListBoxStyle}"
+<<<<<<< HEAD
                              common:AttachedProperties.SelectedItemsSource="{Binding SelectedRouteServiceItems}">
+=======
+                             SelectionChanged="Selector_OnSelectionChanged"
+                             SelectionMode="Single">
+>>>>>>> 4ced8e83619348ce948db4d4aedb18a1f9182e7e
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -105,6 +110,7 @@
                 </Grid>
                 <Grid Grid.Row="1"
                       Grid.Column="1">
+<<<<<<< HEAD
                     <controls:Map x:Name="MyMap">
                         <!--Layers-->
                         <esriLayers:ArcGISLocalTiledLayer Path="ms-appx:///Data/RedlandsBasemap.tpk" />
@@ -124,6 +130,10 @@
                                 </esriSymbols:SimpleRenderer>
                             </esriLayers:GraphicsLayer.Renderer>
                         </esriLayers:GraphicsLayer>
+=======
+                    <controls:Map x:Name="MyMap" Tapped="MyMap_Tapped" >
+                        <layers:ArcGISLocalTiledLayer Path="ms-appx:///Data/RedlandsBasemap.tpk" />
+>>>>>>> 4ced8e83619348ce948db4d4aedb18a1f9182e7e
                     </controls:Map>
                 </Grid>
                 <Grid>
