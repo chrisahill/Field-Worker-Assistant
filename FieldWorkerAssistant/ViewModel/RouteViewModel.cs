@@ -37,7 +37,7 @@ namespace FieldWorkerAssistant
             //SolveRouteCommand = new DelegateCommand(executeSolveRoute, canExecuteSolveRoute);                          
             SyncCommand = new DelegateCommand(syncCommand, canSyncCommand);
             var v = InitRouteService();
-            Task.WaitAll(new[] {v});
+            //Task.WaitAll(new[] {v});
         }
 
         public async Task InitRouteService()
@@ -50,6 +50,8 @@ namespace FieldWorkerAssistant
             routeParams.ReturnRoutes = true;
             routeParams.ReturnDirections = false;
             routeParams.ReturnStops = false;
+
+            IsInitializing = false;
         }
 
         void SelectedRouteServiceItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -110,7 +112,22 @@ namespace FieldWorkerAssistant
                 }
             }
         }
-        
+
+
+        private bool m_initializing = true;
+        public bool IsInitializing
+        {
+            get { return m_initializing; }
+            private set
+            {
+                if (m_initializing != value)
+                {
+                    m_initializing = value;
+                    OnPropertyChanged();
+                    raiseCanExecuteChanged();
+                }
+            }
+        }
 
         private bool m_HasChanges;
 
