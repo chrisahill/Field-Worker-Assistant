@@ -13,6 +13,7 @@ namespace FieldWorkerAssistant.Model
     {
         private string[] fieldNames = new string[] 
         {
+            "OBJECTID",
             "AssignedTo",
             "Type",
             "ProblemDescription",
@@ -29,6 +30,12 @@ namespace FieldWorkerAssistant.Model
             //    throw new Exception("Service Item is missing a required field");
 
             Feature = feature;
+        }
+
+        public int OBJECTID
+        {
+            get { return getAttribute<int>(); }
+            set { setAttribute(value); }
         }
 
         public int ServiceRequestID 

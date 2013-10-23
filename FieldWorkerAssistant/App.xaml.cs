@@ -38,7 +38,7 @@ namespace FieldWorkerAssistant
             this.Suspending += OnSuspending;
 
             ItineraryViewModel = new ItineraryViewModel();
-
+            RouteViewModel = new RouteViewModel();
             SimpleLineSymbol outline = new SimpleLineSymbol()
             {
                 Color = Colors.Black,
@@ -99,7 +99,7 @@ namespace FieldWorkerAssistant
         }
 
         internal ItineraryViewModel ItineraryViewModel { get; private set; }
-        
+        internal RouteViewModel RouteViewModel { get; private set; }
         internal GdbFeature SelectedFeature { get; set; }
         
         internal Renderer WorkItemsRenderer { get; private set; }

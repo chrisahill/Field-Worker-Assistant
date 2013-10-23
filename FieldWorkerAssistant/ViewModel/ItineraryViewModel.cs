@@ -201,7 +201,10 @@ namespace FieldWorkerAssistant.ViewModel
             var cache = await Geodatabase.OpenAsync(geodatabasePath);
             foreach (var source in cache.FeatureTables)
             {
-                CachedFeatureLayer = new ArcGISFeatureLayer(source) { ID = source.Name };                    
+                CachedFeatureLayer = new ArcGISFeatureLayer(source) { ID = source.Name , Renderer = ((App)App.Current).WorkItemsRenderer};
+                var gdbFeatures = await CachedFeatureLayer.FeatureTable.QueryAsync(from item in IncludedServiceItems select (long) item.Service.OBJECTID);
+               ((App)App.Current).RouteViewModel.CachedFeatureLayer = CachedFeatureLayer;
+               ((App)App.Current).RouteViewModel.InitializeServiceItems(gdbFeatures);
                 break;
             }
         }
@@ -218,6 +221,7 @@ namespace FieldWorkerAssistant.ViewModel
                 if (m_CachedFeatureLayer != value)
                 {
                     m_CachedFeatureLayer = value;                    
+                 
                     OnPropertyChanged();
                 }
             }
