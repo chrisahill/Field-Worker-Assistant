@@ -9,7 +9,7 @@ namespace FieldWorkerAssistant.Common
     public class Constants
     {
         public const string HIGH_PRIORITY = "High";
-        public const string NORMAL_PRIORITY = "Normal";
+        public const string NORMAL_PRIORITY = "Medium";
         public const string LOW_PRIORITY = "Low";
     }
 }

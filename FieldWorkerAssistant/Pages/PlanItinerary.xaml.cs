@@ -1,4 +1,8 @@
-﻿using FieldWorkerAssistant.Model;
+﻿using Esri.ArcGISRuntime.Geometry;
+using Esri.ArcGISRuntime.Layers;
+using Esri.ArcGISRuntime.Symbology;
+using FieldWorkerAssistant.Converters;
+using FieldWorkerAssistant.Model;
 using FieldWorkerAssistant.ViewModel;
 using System;
 using System.Collections;
@@ -8,6 +12,7 @@ using System.IO;
 using System.Linq;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -25,11 +30,57 @@ namespace FieldWorkerAssistant.Pages
     /// </summary>
     public sealed partial class PlanItinerary : FieldWorkerAssistant.Common.LayoutAwarePage
     {
-        ItineraryViewModel m_viewModel = new ItineraryViewModel();
         public PlanItinerary()
         {
             this.InitializeComponent();
-            this.DataContext = m_viewModel;
+
+            var viewModel = ((App)App.Current).ItineraryViewModel;
+            this.DataContext = viewModel;
+
+            MainMap.InitialExtent = new Envelope(-13046907.1247363, 4034314.00501996, -13042604.5495666, 4038309.25339177,
+                SpatialReferences.WebMercator);
+
+            // Bind source of all items and included items - need to do it in code behind because it can't be 
+            // done in XAML
+            GraphicsLayer includedItemsLayer = (GraphicsLayer)MainMap.Layers["IncludedItemsLayer"];
+            Binding b = new Binding()
+            {
+                Path = new PropertyPath("IncludedServiceItems"),
+                Source = viewModel,
+                Converter = new ServiceItemsToFeatures()
+            };
+            BindingOperations.SetBinding(includedItemsLayer, GraphicsLayer.GraphicsSourceProperty, b);
+
+            FeatureLayer workItemsLayer = (FeatureLayer)MainMap.Layers["WorkItemsLayer"];
+            if (workItemsLayer.Graphics.Count > 0)
+            {
+                viewModel.InitializeServiceItems(workItemsLayer.Graphics);
+            }
+            else
+            {
+                workItemsLayer.Graphics.CollectionChanged += (o, e) => 
+                    viewModel.InitializeServiceItems(workItemsLayer.Graphics);
+            }
+        }
+
+        void WorkItemsLayer_Tapped(object sender, GraphicTappedRoutedEventArgs e)
+        {
+            toggleSelectGraphic(e.Graphic);
+        }
+
+        private void toggleSelectGraphic(Graphic g)
+        {
+            var viewModel = ((App)Application.Current).ItineraryViewModel;
+            if (viewModel.IncludedServiceItems.Any(item => item.Service.Feature == g))
+            {
+                var selectedItem = viewModel.IncludedServiceItems.First(item => item.Service.Feature == g);
+                viewModel.IncludedServiceItems.Remove(selectedItem);
+            }
+            else if (viewModel.AllServiceItems.Any(item => item.Service.Feature == g))
+            {
+                var newItem = viewModel.AllServiceItems.First(item => item.Service.Feature == g);
+                viewModel.IncludedServiceItems.Add(newItem);
+            }
         }
 
         /// <summary>
@@ -62,6 +113,11 @@ namespace FieldWorkerAssistant.Pages
 
             foreach (ServiceItemViewModel item in e.RemovedItems)
                 item.Included = false;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(Route));
         }
     }
 }

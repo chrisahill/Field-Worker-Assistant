@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Esri.ArcGISRuntime.Data;
+using Esri.ArcGISRuntime.Layers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,14 +11,91 @@ namespace FieldWorkerAssistant.Model
 {
     public class ServiceItem
     {
-        public int ServiceRequestID { get; set; }
-        public string AssignedTo { get; set; }
-        public string Type { get; set; }
-        public string ProblemDescription { get; set; }
-        public string Severity { get; set; }
-        public string DateEntered { get; set; }
-        public string DateResolved { get; set; }
-        public string Status { get; set; }
-        public string ActionTaken { get; set; }
+        private string[] fieldNames = new string[] 
+        {
+            "OBJECTID",
+            "AssignedTo",
+            "Type",
+            "ProblemDescription",
+            "Severity",
+            "DateEntered",
+            "DateResolved",
+            "Status",
+            "ActionTaken"
+        };
+
+        public ServiceItem(Feature feature)
+        {
+            //if (fieldNames.Any(name => !feature.Attributes.ContainsKey(name)))
+            //    throw new Exception("Service Item is missing a required field");
+
+            Feature = feature;
+        }
+
+        public int OBJECTID
+        {
+            get { return getAttribute<int>(); }
+            set { setAttribute(value); }
+        }
+
+        public int ServiceRequestID 
+        {
+            get { return getAttribute<int>(); }
+            set { setAttribute(value); }
+        }
+
+        public string AssignedTo
+        {
+            get { return getAttribute<string>(); }
+            set { setAttribute(value); }
+        }
+
+        public string Type
+        {
+            get { return getAttribute<string>(); }
+            set { setAttribute(value); }
+        }
+        public string ProblemDescription
+        {
+            get { return getAttribute<string>(); }
+            set { setAttribute(value); }
+        }
+        public string Severity
+        {
+            get { return getAttribute<string>(); }
+            set { setAttribute(value); }
+        }
+        public string DateEntered
+        {
+            get { return getAttribute<string>(); }
+            set { setAttribute(value); }
+        }
+        public string DateResolved
+        {
+            get { return getAttribute<string>(); }
+            set { setAttribute(value); }
+        }
+        public string Status
+        {
+            get { return getAttribute<string>(); }
+            set { setAttribute(value); }
+        }
+        public string ActionTaken
+        {
+            get { return getAttribute<string>(); }
+            set { setAttribute(value); }
+        }
+
+        public Feature Feature { get; private set; }
+
+        private T getAttribute<T>([CallerMemberName] string attributeName = null)
+        {
+            return (T)Feature.Attributes[attributeName];
+        }
+
+        private void setAttribute(object value, [CallerMemberName] string attributeName = null)
+        {
+            Feature.Attributes[attributeName] = value;
+        }
     }
 }

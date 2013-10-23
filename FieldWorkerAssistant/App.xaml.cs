@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Esri.ArcGISRuntime.Data;
+using Esri.ArcGISRuntime.Symbology;
+using FieldWorkerAssistant.Common;
+using FieldWorkerAssistant.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,6 +10,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -31,7 +36,73 @@ namespace FieldWorkerAssistant
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+
+            ItineraryViewModel = new ItineraryViewModel();
+            RouteViewModel = new RouteViewModel();
+            SimpleLineSymbol outline = new SimpleLineSymbol()
+            {
+                Color = Colors.Black,
+                Width = 2
+            };
+
+            int markerSize = 28;
+            SimpleMarkerSymbol defaultSymbol = new SimpleMarkerSymbol()
+            {
+                Color = Color.FromArgb(125, 200, 200, 200),
+                Size = markerSize,
+                Outline = outline
+            };
+            SimpleMarkerSymbol lowPrioritySymbol = new SimpleMarkerSymbol()
+            {
+                Color = Color.FromArgb(125, 0, 0, 255),
+                Size = markerSize,
+                Outline = outline
+            };
+            SimpleMarkerSymbol mediumPrioritySymbol = new SimpleMarkerSymbol()
+            {
+                Color = Color.FromArgb(125, 255, 165, 0),
+                Size = markerSize,
+                Outline = outline
+            };
+            SimpleMarkerSymbol highPrioritySymbol = new SimpleMarkerSymbol()
+            {
+                Color = Color.FromArgb(125, 255, 0, 0),
+                Size = markerSize,
+                Outline = outline
+            };
+
+            UniqueValueInfo lowPriorityInfo = new UniqueValueInfo()
+            {
+                Symbol = lowPrioritySymbol,
+                Values = new UniqueValueCollection(Constants.LOW_PRIORITY)
+            };
+            UniqueValueInfo mediumPriorityInfo = new UniqueValueInfo()
+            {
+                Symbol = mediumPrioritySymbol,
+                Values = new UniqueValueCollection(Constants.NORMAL_PRIORITY)
+            };
+            UniqueValueInfo highPriorityInfo = new UniqueValueInfo()
+            {
+                Symbol = highPrioritySymbol,
+                Values = new UniqueValueCollection(Constants.HIGH_PRIORITY)
+            };
+
+            UniqueValueRenderer uvRenderer = new UniqueValueRenderer();
+            uvRenderer.Fields.Add("Severity");
+            uvRenderer.Infos.Add(lowPriorityInfo);
+            uvRenderer.Infos.Add(mediumPriorityInfo);
+            uvRenderer.Infos.Add(highPriorityInfo);
+
+            uvRenderer.DefaultSymbol = defaultSymbol;
+
+            WorkItemsRenderer = uvRenderer;
         }
+
+        internal ItineraryViewModel ItineraryViewModel { get; private set; }
+        internal RouteViewModel RouteViewModel { get; private set; }
+        internal GdbFeature SelectedFeature { get; set; }
+        
+        internal Renderer WorkItemsRenderer { get; private set; }
 
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
@@ -71,6 +142,8 @@ namespace FieldWorkerAssistant
             }
             // Ensure the current window is active
             Window.Current.Activate();
+
+            App.Current.Resources.Add("WorkItemsRenderer", WorkItemsRenderer);
         }
 
         /// <summary>

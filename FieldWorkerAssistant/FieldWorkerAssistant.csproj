@@ -124,7 +124,7 @@
     <Compile Include="Common\RichTextColumns.cs" />
     <Compile Include="Common\SuspensionManager.cs" />
     <Compile Include="Converters\PriorityToBrushConverter.cs" />
-    <Compile Include="Converters\ZeroToBoolConverter.cs" />
+    <Compile Include="Converters\ServiceItemsToFeatures.cs" />
     <Compile Include="Model\ServiceItem.cs" />
     <Compile Include="Pages\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -140,6 +140,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\ItineraryViewModel.cs" />
+    <Compile Include="ViewModel\RouteViewModel.cs" />
     <Compile Include="ViewModel\ServiceItemViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
