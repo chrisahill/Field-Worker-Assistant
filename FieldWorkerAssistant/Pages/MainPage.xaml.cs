@@ -49,7 +49,8 @@ namespace FieldWorkerAssistant
                     Caption = "Sign In",
                     Message = "Sign in to get service items",
                     CredentialSaveOption = CredentialSaveOption.Unselected,
-                    CallerSavesCredential = false
+                    CallerSavesCredential = false,
+                    AuthenticationProtocol = AuthenticationProtocol.Basic
                 };
                 var result = await CredentialPicker.PickAsync(options);
                 if (result.ErrorCode != 2147943623) // Cancelled
