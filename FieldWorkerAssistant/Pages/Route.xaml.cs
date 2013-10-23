@@ -27,6 +27,20 @@ namespace FieldWorkerAssistant.Pages
             this.InitializeComponent();
             var viewModel = ((App)App.Current).RouteViewModel;
             this.DataContext = viewModel;
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+            var viewModel = ((App)App.Current).RouteViewModel;
+            if (MyMap.Layers.Contains(viewModel.CachedFeatureLayer))
+                MyMap.Layers.Remove(viewModel.CachedFeatureLayer);
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            var viewModel = ((App)App.Current).RouteViewModel;
             if (!MyMap.Layers.Contains(viewModel.CachedFeatureLayer))
                 MyMap.Layers.Add(viewModel.CachedFeatureLayer);
         }

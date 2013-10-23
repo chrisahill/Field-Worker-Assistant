@@ -10,6 +10,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -100,8 +101,7 @@ namespace FieldWorkerAssistant
 
         internal ItineraryViewModel ItineraryViewModel { get; private set; }
         internal RouteViewModel RouteViewModel { get; private set; }
-        internal GdbFeature SelectedFeature { get; set; }
-        
+        internal GdbFeature SelectedFeature { get; set; }        
         internal Renderer WorkItemsRenderer { get; private set; }
 
         // Stores whether the user has logged in to the app
@@ -113,7 +113,7 @@ namespace FieldWorkerAssistant
         /// search results, and so forth.
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs args)
+        protected override async void OnLaunched(LaunchActivatedEventArgs args)
         {
             Frame rootFrame = Window.Current.Content as Frame;
 
@@ -133,8 +133,20 @@ namespace FieldWorkerAssistant
                 Window.Current.Content = rootFrame;
             }
 
+            string path = ApplicationData.Current.LocalFolder.Path;
+            try
+            {
+                var file = await ApplicationData.Current.LocalFolder.GetFileAsync("Replica.geodatabase");
+                if (file != null) // Offline data exists - allow resumption of route
+                {
+                    await ItineraryViewModel.CreateCachedFeatureLayer(file);
+                }
+            }
+            catch { }
+
             if (rootFrame.Content == null)
             {
+                App.Current.Resources.Add("WorkItemsRenderer", WorkItemsRenderer);
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
@@ -145,8 +157,6 @@ namespace FieldWorkerAssistant
             }
             // Ensure the current window is active
             Window.Current.Activate();
-
-            App.Current.Resources.Add("WorkItemsRenderer", WorkItemsRenderer);
         }
 
         /// <summary>

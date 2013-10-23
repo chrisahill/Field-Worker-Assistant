@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using Windows.Foundation;
@@ -36,6 +37,7 @@ namespace FieldWorkerAssistant.Pages
             this.InitializeComponent();
         }
 
+        private bool m_downloadInProgress;
         protected async override void OnNavigatedTo(NavigationEventArgs args)
         {
             base.OnNavigatedTo(args);
@@ -44,6 +46,9 @@ namespace FieldWorkerAssistant.Pages
 
             var viewModel = app.ItineraryViewModel;
             this.DataContext = viewModel;
+
+            viewModel.PropertyChanged -= viewModel_PropertyChanged;
+            viewModel.PropertyChanged += viewModel_PropertyChanged;
 
             MainMap.InitialExtent = new Envelope(-13046907.1247363, 4034314.00501996, -13042604.5495666, 4038309.25339177,
                 SpatialReferences.WebMercator);
@@ -70,6 +75,24 @@ namespace FieldWorkerAssistant.Pages
                     viewModel.InitializeServiceItems(workItemsLayer.Graphics);
             }
 
+        }
+
+        void viewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "IsDownloading")
+            {
+                var viewModel = (ItineraryViewModel)sender;
+                if (viewModel.IsDownloading)
+                {
+                    m_downloadInProgress = true;
+                }
+                else if (!viewModel.IsDownloading && m_downloadInProgress
+                    && viewModel.CachedFeatureLayer != null) // download complete - go to route page
+                {
+                    m_downloadInProgress = false;
+                    Frame.Navigate(typeof(Route));
+                }
+            }
         }
 
         void WorkItemsLayer_Tapped(object sender, GraphicTappedRoutedEventArgs e)

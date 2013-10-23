@@ -26,6 +26,7 @@ namespace FieldWorkerAssistant
         public MainPage()
         {
             this.InitializeComponent();
+            DataContext = ((App)Application.Current).RouteViewModel;
         }
 
         /// <summary>

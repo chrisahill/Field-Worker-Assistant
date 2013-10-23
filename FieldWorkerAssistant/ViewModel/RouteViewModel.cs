@@ -71,6 +71,11 @@ namespace FieldWorkerAssistant
         public ICommand GeocodeCommand { get; private set; }
         public ICommand ReverseGeocodeCommand { get; private set; }
 
+        /// <summary>
+        /// Gets the file underlying the <see cref="CachedFeatureLayer"/>
+        /// </summary>
+        public StorageFile GdbFile { get; internal set; }
+
         private bool canExecuteSolveRoute(object parameter)
         {
             return true;
