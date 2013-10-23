@@ -18,7 +18,7 @@
     <Page.Resources>
         <converters:PriorityToBrushConverter x:Key="PriorityToColorConverter" />
         <!-- TODO: Delete this line if the key AppName is declared in App.xaml -->
-        <x:String x:Key="AppName">Route</x:String>
+        <x:String x:Key="AppName">Route to Service Item</x:String>
         <DataTemplate x:Key="RouteItemTemplate">
             <StackPanel>
                 <TextBlock Text="{Binding Attributes[ServiceRequestID]}" />
@@ -134,7 +134,27 @@
                     <RowDefinition />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBlock Text="Downloading selected service items..."
+                <TextBlock Text="Initializing route data..."
+                       FontSize="30"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Bottom"
+                       Margin="0,0,0,5"/>
+                <ProgressBar IsIndeterminate="True"
+                         HorizontalAlignment="Stretch"
+                         VerticalAlignment="Top"
+                         Margin="0,5,0,0"
+                         Grid.Row="1"/>
+            </Grid>
+
+            <Grid Background="#CC000000"
+              Visibility="{Binding IsSynching, Converter={StaticResource BoolToVisibilityConverter}}"
+              Grid.Row="1"
+              Grid.ColumnSpan="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBlock Text="Syncing changes with online database..."
                        FontSize="30"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Bottom"
@@ -179,10 +199,16 @@
     </Grid>
     <common:LayoutAwarePage.BottomAppBar>
         <AppBar IsSticky="True" IsOpen="True" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" BorderBrush="Transparent">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Worksheet" Click="Worksheet_Click" />
-                <Button Content="Sync" Command="{Binding SyncCommand}"/>
-            </StackPanel>
+            <Grid>
+                <Button x:Name="WorksheetButton" 
+                        Content="Worksheet" 
+                        Click="Worksheet_Click" 
+                        IsEnabled="false"
+                        HorizontalAlignment="Left"/>
+                <Button Content="Sync Changes" 
+                        Command="{Binding SyncCommand}" 
+                        HorizontalAlignment="Right"/>
+            </Grid>
         </AppBar>
     </common:LayoutAwarePage.BottomAppBar>
 </common:LayoutAwarePage>

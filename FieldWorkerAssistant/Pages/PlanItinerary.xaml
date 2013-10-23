@@ -116,7 +116,7 @@
             <esriLayers:ArcGISTiledMapServiceLayer
                 ServiceUri="http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer" />
             <esriLayers:FeatureLayer
-                ID="WorkItemsLayer"
+                ID="WorkItemsLayer" 
                 ServiceUri="http://services.arcgis.com/pmcEyn9tLWCoX7Dm/arcgis/rest/services/HackathonSR/FeatureServer/0" 
                 Renderer="{StaticResource WorkItemsRenderer}"
                 Tapped="WorkItemsLayer_Tapped">

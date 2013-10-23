@@ -70,8 +70,9 @@ namespace FieldWorkerAssistant.Pages
         {
             feature.Attributes["Status"] = StatusComboBox.SelectedItem;
             feature.Attributes["ActionTaken"] = ActionTakenTextBox.Text;
-            await ((App) App.Current).RouteViewModel.CachedFeatureLayer.FeatureTable.UpdateAsync(feature);
-            ((App) App.Current).RouteViewModel.HasChanges = true;
+            var viewModel = ((App)App.Current).RouteViewModel;
+            await viewModel.CachedFeatureLayer.FeatureTable.UpdateAsync(feature);
+            viewModel.HasChanges = true;
             if(Frame.CanGoBack)
                 Frame.GoBack();            
         }
