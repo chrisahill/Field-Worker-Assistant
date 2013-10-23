@@ -181,7 +181,7 @@
         <AppBar IsSticky="True" IsOpen="True" Background="{StaticResource ApplicationPageBackgroundThemeBrush}" BorderBrush="Transparent">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="Worksheet" Click="Worksheet_Click" />
-                <Button Content="Sync" />
+                <Button Content="Sync" Command="{Binding SyncCommand}"/>
             </StackPanel>
         </AppBar>
     </common:LayoutAwarePage.BottomAppBar>
