@@ -169,6 +169,8 @@ namespace FieldWorkerAssistant.Pages
 
         private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            WorksheetButton.IsEnabled = true;
+
             var item = (ServiceItemViewModel) e.AddedItems[0];            
             var startPoint = new Graphic {Geometry = MyMap.LocationDisplay.CurrentLocation.Location};
             var endPoint = new Graphic {Geometry = item.Service.Feature.Geometry};

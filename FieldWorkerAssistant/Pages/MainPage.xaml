@@ -39,7 +39,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0"
-                        Content="New Route" 
+                        Content="New Itinerary" 
                         Click="NewRoute_Click"
                         Padding="40"
                         Margin="40" 
@@ -49,7 +49,7 @@
                         FontSize="42"
                         />
                     <Button Grid.Column="1"
-                        Content="Current Route" 
+                        Content="Resume Itinerary" 
                         Click="CurrentRoute_Click" 
                         Padding="40"
                         Margin="40"
