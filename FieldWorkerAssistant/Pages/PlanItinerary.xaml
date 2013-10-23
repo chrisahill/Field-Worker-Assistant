@@ -180,7 +180,8 @@
             <esriLayers:FeatureLayer
                 ID="WorkItemsLayer"
                 ServiceUri="http://services.arcgis.com/pmcEyn9tLWCoX7Dm/arcgis/rest/services/HackathonSR/FeatureServer/0" 
-                Renderer="{StaticResource WorkItemsRenderer}">
+                Renderer="{StaticResource WorkItemsRenderer}"
+                Tapped="WorkItemsLayer_Tapped">
                 <esriLayers:FeatureLayer.OutFields>
                     <esriQuery:OutFields>
                         <x:String>*</x:String>
@@ -193,7 +194,7 @@
                     <esriSymbols:SimpleRenderer>
                         <esriSymbols:SimpleRenderer.Symbol>
                             <esriSymbols:SimpleMarkerSymbol Color ="Cyan"
-                                                            Size="20">
+                                                            Size="28">
                                 <esriSymbols:SimpleMarkerSymbol.Outline>
                                     <esriSymbols:SimpleLineSymbol Color="Black"
                                                                   Width="2" />
@@ -253,8 +254,13 @@
                     Command="{Binding ExcludeAllCommand}" />
                 <Button Content="Download"
                         Grid.Column="2"
+<<<<<<< HEAD
                         Command="{Binding DownloadCommand}"
                         HorizontalAlignment="Right"/>
+=======
+                        HorizontalAlignment="Right"
+                        Click="Button_Click"/>
+>>>>>>> 795af81870a8e9dac7dd81a2034e36998960aa1f
             </Grid>
         </AppBar>
     </common:LayoutAwarePage.BottomAppBar>

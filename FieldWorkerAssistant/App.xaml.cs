@@ -1,4 +1,5 @@
-﻿using Esri.ArcGISRuntime.Symbology;
+﻿using Esri.ArcGISRuntime.Data;
+using Esri.ArcGISRuntime.Symbology;
 using FieldWorkerAssistant.Common;
 using FieldWorkerAssistant.ViewModel;
 using System;
@@ -43,28 +44,30 @@ namespace FieldWorkerAssistant
                 Color = Colors.Black,
                 Width = 2
             };
+
+            int markerSize = 28;
             SimpleMarkerSymbol defaultSymbol = new SimpleMarkerSymbol()
             {
                 Color = Color.FromArgb(125, 200, 200, 200),
-                Size = 20,
+                Size = markerSize,
                 Outline = outline
             };
             SimpleMarkerSymbol lowPrioritySymbol = new SimpleMarkerSymbol()
             {
                 Color = Color.FromArgb(125, 0, 0, 255),
-                Size = 20,
+                Size = markerSize,
                 Outline = outline
             };
             SimpleMarkerSymbol mediumPrioritySymbol = new SimpleMarkerSymbol()
             {
                 Color = Color.FromArgb(125, 255, 165, 0),
-                Size = 20,
+                Size = markerSize,
                 Outline = outline
             };
             SimpleMarkerSymbol highPrioritySymbol = new SimpleMarkerSymbol()
             {
                 Color = Color.FromArgb(125, 255, 0, 0),
-                Size = 20,
+                Size = markerSize,
                 Outline = outline
             };
 
@@ -96,7 +99,9 @@ namespace FieldWorkerAssistant
         }
 
         internal ItineraryViewModel ItineraryViewModel { get; private set; }
-
+        
+        internal GdbFeature SelectedFeature { get; set; }
+        
         internal Renderer WorkItemsRenderer { get; private set; }
 
         /// <summary>
