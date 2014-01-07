@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234237
 using Windows.UI.Xaml.Navigation;
 using Esri.ArcGISRuntime.Data;
+using Esri.ArcGISRuntime.Geometry;
+using Esri.ArcGISRuntime.Layers;
 using FieldWorkerAssistant.Common;
 
 namespace FieldWorkerAssistant.Pages
@@ -31,7 +34,20 @@ namespace FieldWorkerAssistant.Pages
 
             var clock = new DispatcherTimer {Interval = new TimeSpan(0,0,1,0,0)};
             clock.Tick += (s, e) => { pageTime.Text = DateTime.Now.ToString("h:mm tt"); };
-            clock.Start();            
+            clock.Start();
+
+            var gr = feature.AsGraphic();
+            gr.Attributes.Remove(gr.Attributes.FirstOrDefault(kvp => kvp.Key == "GlobalID"));
+            double xmin, xmax, ymin, ymax;
+            var point = (MapPoint) gr.Geometry;
+            xmin = point.X - 1000;
+            xmax = point.X + 1000;
+            ymin = point.Y - 1000;
+            ymax = point.Y + 1000;
+            mySmallMap.InitialExtent = new Envelope(xmin, ymin, xmax, ymax, SpatialReferences.WebMercator);
+            mySmallMap.IsHitTestVisible = false;
+            var gl = mySmallMap.Layers["SelectedItemsLayer"] as GraphicsLayer;
+            gl.Graphics.Add(gr);
 
         }
 
@@ -62,8 +78,9 @@ namespace FieldWorkerAssistant.Pages
         {
             feature.Attributes["Status"] = StatusComboBox.SelectedItem;
             feature.Attributes["ActionTaken"] = ActionTakenTextBox.Text;
-            await ((App) App.Current).RouteViewModel.CachedFeatureLayer.FeatureTable.UpdateAsync(feature);
-            ((App) App.Current).RouteViewModel.HasChanges = true;
+            var viewModel = ((App)App.Current).RouteViewModel;
+            await viewModel.CachedFeatureLayer.FeatureTable.UpdateAsync(feature);
+            viewModel.HasChanges = true;
             if(Frame.CanGoBack)
                 Frame.GoBack();            
         }

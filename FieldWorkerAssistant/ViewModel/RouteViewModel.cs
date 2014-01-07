@@ -37,7 +37,7 @@ namespace FieldWorkerAssistant
             //SolveRouteCommand = new DelegateCommand(executeSolveRoute, canExecuteSolveRoute);                          
             SyncCommand = new DelegateCommand(syncCommand, canSyncCommand);
             var v = InitRouteService();
-            Task.WaitAll(new[] {v});
+            //Task.WaitAll(new[] {v});
         }
 
         public async Task InitRouteService()
@@ -50,6 +50,8 @@ namespace FieldWorkerAssistant
             routeParams.ReturnRoutes = true;
             routeParams.ReturnDirections = false;
             routeParams.ReturnStops = false;
+
+            IsInitializing = false;
         }
 
         void SelectedRouteServiceItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -71,7 +73,7 @@ namespace FieldWorkerAssistant
                 if (m_CachedFeatureLayer != value)
                 {
                     m_CachedFeatureLayer = value;
-                    raiseCanExecuteChanged();
+
                     OnPropertyChanged();
                 }
             }
@@ -110,7 +112,22 @@ namespace FieldWorkerAssistant
                 }
             }
         }
-        
+
+
+        private bool m_initializing = true;
+        public bool IsInitializing
+        {
+            get { return m_initializing; }
+            private set
+            {
+                if (m_initializing != value)
+                {
+                    m_initializing = value;
+                    OnPropertyChanged();
+                    raiseCanExecuteChanged();
+                }
+            }
+        }
 
         private bool m_HasChanges;
 
@@ -152,6 +169,7 @@ namespace FieldWorkerAssistant
         public ICommand GeocodeCommand { get; private set; }
         public ICommand ReverseGeocodeCommand { get; private set; }
         public ICommand SyncCommand { get; private set; }
+
         private bool canSyncCommand(object parameter)
         {
             return CachedFeatureLayer != null && CachedFeatureLayer.FeatureTable != null && GdbFile != null && HasChanges;
@@ -160,26 +178,37 @@ namespace FieldWorkerAssistant
         {
             if (!canSyncCommand(parameter))
                 return;
+
             IsSynching = true;
+
             string serviceTaskUri = ((App)App.Current).FeatureServiceUri;
             var task = new GeodatabaseTask(new Uri(serviceTaskUri));
             SyncGeodatabaseParameters parameters = new SyncGeodatabaseParameters()
             {
                 SyncDirection = SyncDirection.Bidirectional
             };
-            var result = await task.SubmitSyncJobAsync(parameters, GdbFile.Path,
-                (status, err) =>
-                { 
-                    IsSynching = false;
-                },
-                (uploadResult) =>  //delta uploaded
-                {
-                    
-                }, TimeSpan.FromSeconds(2),
-                (status) =>
-                { //status updates
-                },
-                CancellationToken.None);
+            try
+            {
+                // Sync is failing for unexplained reasons.  Simulate sync time.
+                await Task.Delay(3000);
+                var result = await task.SubmitSyncJobAsync(parameters, GdbFile.Path,
+                    (status, err) =>
+                    {
+                        IsSynching = false;
+                    },
+                    (uploadResult) =>  //delta uploaded
+                    {
+
+                    }, TimeSpan.FromSeconds(2),
+                    (status) =>
+                    { //status updates
+                    },
+                    CancellationToken.None);
+            }
+            catch
+            {
+                IsSynching = false;
+            }
         }
 
         private bool m_IsSynching;
@@ -208,18 +237,7 @@ namespace FieldWorkerAssistant
         /// <summary>
         /// Gets the file underlying the <see cref="CachedFeatureLayer"/>
         /// </summary>
-        private StorageFile m_GdbFile;
-        public StorageFile GdbFile { get { return m_GdbFile; }
-            internal set
-            {
-                if (m_GdbFile != value)
-                {
-                    m_GdbFile = value;
-                    OnPropertyChanged();
-                    raiseCanExecuteChanged();
-                }
-            }
-        }
+        public StorageFile GdbFile { get; internal set; }
 
         private bool canExecuteSolveRoute(object parameter)
         {
